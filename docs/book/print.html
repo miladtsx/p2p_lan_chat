@@ -1,0 +1,631 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>P2P Chat Documentation</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="A comprehensive guide to the P2P Chat project: concepts, architecture, and learning outcomes.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">P2P Chat Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="p2p-chat-documentation"><a class="header" href="#p2p-chat-documentation">P2P Chat Documentation</a></h1>
+<p>Welcome to the documentation for the P2P Chat project! This book covers the concepts, learning outcomes, and example sessions for the peer-to-peer chat application written in Rust.</p>
+<p>Use the navigation to explore concepts, summaries, and walkthroughs.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="-peer-to-peer-networking-concepts"><a class="header" href="#-peer-to-peer-networking-concepts">🌐 Peer-to-Peer Networking Concepts</a></h1>
+<p>This document explains the key P2P networking concepts demonstrated by our Chat application.</p>
+<h2 id="-what-is-peer-to-peer-p2p-networking"><a class="header" href="#-what-is-peer-to-peer-p2p-networking">🔍 What is Peer-to-Peer (P2P) Networking?</a></h2>
+<p>P2P networking is a distributed architecture where participants (peers) act as both clients and servers. Unlike traditional client-server models, there's no central authority - peers communicate directly with each other.</p>
+<h2 id="-key-p2p-concepts-demonstrated"><a class="header" href="#-key-p2p-concepts-demonstrated">🏗️ Key P2P Concepts Demonstrated</a></h2>
+<h3 id="1-peer-discovery"><a class="header" href="#1-peer-discovery">1. <strong>Peer Discovery</strong></a></h3>
+<p><strong>Problem</strong>: How do peers find each other without a central directory?</p>
+<p><strong>Our Solution</strong>: UDP Broadcasting</p>
+<ul>
+<li>Each peer broadcasts its presence on UDP port 9999</li>
+<li>Peers listen for these broadcasts and maintain a peer list</li>
+<li>No central server needed - fully decentralized discovery</li>
+</ul>
+<pre><code>Peer A -----&gt; [UDP Broadcast] -----&gt; Network
+Peer B -----&gt; [UDP Broadcast] -----&gt; Network
+Peer C -----&gt; [UDP Broadcast] -----&gt; Network
+
+Each peer receives broadcasts from others and builds a peer list
+</code></pre>
+<h3 id="2-direct-communication"><a class="header" href="#2-direct-communication">2. <strong>Direct Communication</strong></a></h3>
+<p><strong>Problem</strong>: How do peers communicate reliably once discovered?</p>
+<p><strong>Our Solution</strong>: TCP Connections</p>
+<ul>
+<li>After discovery, peers connect directly via TCP</li>
+<li>Messages are sent point-to-point for reliability</li>
+<li>No intermediary servers - true P2P communication</li>
+</ul>
+<pre><code>Alice ---&gt; [TCP Message] ---&gt; Bob
+Alice ---&gt; [TCP Message] ---&gt; Charlie
+Bob   ---&gt; [TCP Message] ---&gt; Alice &amp; Charlie
+</code></pre>
+<h3 id="3-broadcast-messaging"><a class="header" href="#3-broadcast-messaging">3. <strong>Broadcast Messaging</strong></a></h3>
+<p><strong>Problem</strong>: How to send a message to all peers efficiently?</p>
+<p><strong>Our Solution</strong>: Multi-cast via Direct Connections</p>
+<ul>
+<li>When a user sends a message, it's sent to all known peers</li>
+<li>Each peer receives the message independently</li>
+<li>Similar to how P2P Chat work!</li>
+</ul>
+<h3 id="4-network-protocol-design"><a class="header" href="#4-network-protocol-design">4. <strong>Network Protocol Design</strong></a></h3>
+<p><strong>Problem</strong>: How do peers understand each other's messages?</p>
+<p><strong>Our Solution</strong>: JSON-based Message Protocol</p>
+<pre><code class="language-json">// Discovery Message
+{
+  "Discovery": {
+    "id": "uuid-string",
+    "name": "Alice",
+    "ip": "192.168.1.100",
+    "port": 8080
+  }
+}
+
+// Chat Message
+{
+  "Chat": {
+    "from_id": "uuid-string",
+    "from_name": "Alice",
+    "content": "Hello everyone!",
+    "timestamp": 1234567890
+  }
+}
+
+// Heartbeat Message
+{
+  "Heartbeat": "uuid-string"
+}
+</code></pre>
+<h3 id="5-network-resilience"><a class="header" href="#5-network-resilience">5. <strong>Network Resilience</strong></a></h3>
+<p><strong>Problem</strong>: How to handle peers joining and leaving?</p>
+<p><strong>Our Solution</strong>: Heartbeat System</p>
+<ul>
+<li>Peers send periodic heartbeat messages</li>
+<li>Failed connections indicate departed peers</li>
+<li>New peers are automatically discovered</li>
+</ul>
+<h2 id="-p2p-vs-client-server-comparison"><a class="header" href="#-p2p-vs-client-server-comparison">🎯 P2P vs Client-Server Comparison</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Aspect</th><th>P2P (P2P_Chat)</th><th>Client-Server</th></tr></thead><tbody>
+<tr><td><strong>Architecture</strong></td><td>Decentralized</td><td>Centralized</td></tr>
+<tr><td><strong>Failure Points</strong></td><td>No single point of failure</td><td>Server failure breaks everything</td></tr>
+<tr><td><strong>Scalability</strong></td><td>Scales with peers</td><td>Limited by server capacity</td></tr>
+<tr><td><strong>Discovery</strong></td><td>Peer-to-peer discovery</td><td>Central directory</td></tr>
+<tr><td><strong>Communication</strong></td><td>Direct peer connections</td><td>Through server</td></tr>
+<tr><td><strong>Complexity</strong></td><td>Higher (peer coordination)</td><td>Lower (server handles logic)</td></tr>
+</tbody></table>
+</div>
+<h2 id="-technical-implementation-details"><a class="header" href="#-technical-implementation-details">🔧 Technical Implementation Details</a></h2>
+<h3 id="udp-broadcasting-for-discovery"><a class="header" href="#udp-broadcasting-for-discovery">UDP Broadcasting for Discovery</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Send discovery broadcast
+let discovery_msg = NetworkMessage::Discovery(peer_info);
+socket.send_to(&amp;msg_bytes, "255.255.255.255:9999").await?;
+<span class="boring">}</span></code></pre></pre>
+<h3 id="tcp-for-reliable-messaging"><a class="header" href="#tcp-for-reliable-messaging">TCP for Reliable Messaging</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Send message to specific peer
+let mut stream = TcpStream::connect((peer.ip, peer.port)).await?;
+stream.write_all(&amp;msg_bytes).await?;
+<span class="boring">}</span></code></pre></pre>
+<h3 id="async-concurrent-operations"><a class="header" href="#async-concurrent-operations">Async Concurrent Operations</a></h3>
+<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Run multiple network operations concurrently
+tokio::select! {
+    _ = tcp_listener =&gt; {},
+    _ = discovery_broadcaster =&gt; {},
+    _ = discovery_listener =&gt; {},
+    _ = heartbeat_sender =&gt; {},
+    _ = cli_handler =&gt; {},
+}
+<span class="boring">}</span></code></pre></pre>
+<h2 id="-real-world-p2p-examples"><a class="header" href="#-real-world-p2p-examples">🎮 Real-World P2P Examples</a></h2>
+<p>Our P2P_Chat demonstrates concepts used in:</p>
+<ul>
+<li><strong>BitTorrent</strong>: File sharing between peers</li>
+<li><strong>Skype</strong>: Direct voice/video calls (originally P2P)</li>
+<li><strong>Bitcoin</strong>: Decentralized cryptocurrency network</li>
+<li><strong>IPFS</strong>: Distributed file system</li>
+<li><strong>Mesh Networks</strong>: Disaster-resistant communication</li>
+</ul>
+<h2 id="-advanced-p2p-concepts-to-explore"><a class="header" href="#-advanced-p2p-concepts-to-explore">🚀 Advanced P2P Concepts to Explore</a></h2>
+<ol>
+<li><strong>NAT Traversal</strong>: Connecting peers behind firewalls</li>
+<li><strong>DHT (Distributed Hash Tables)</strong>: Efficient peer lookup</li>
+<li><strong>Consensus Algorithms</strong>: Agreement in distributed systems</li>
+<li><strong>Gossip Protocols</strong>: Efficient information spread</li>
+<li><strong>Kademlia</strong>: Structured P2P overlay networks</li>
+<li><strong>Cryptographic Security</strong>: Secure P2P communication</li>
+</ol>
+<h2 id="-learning-outcomes"><a class="header" href="#-learning-outcomes">🎯 Learning Outcomes</a></h2>
+<p>By building this P2P_Chat, I've learned:</p>
+<p>✅ <strong>Peer Discovery</strong>: How peers find each other automatically<br />
+✅ <strong>Protocol Design</strong>: Creating message formats for P2P communication<br />
+✅ <strong>Network Programming</strong>: UDP vs TCP usage patterns<br />
+✅ <strong>Async Programming</strong>: Concurrent network operations in Rust<br />
+✅ <strong>Distributed Systems</strong>: Challenges of decentralized architecture<br />
+✅ <strong>Real-time Communication</strong>: Building interactive network applications</p>
+<h2 id="-next-steps"><a class="header" href="#-next-steps">🔮 Next Steps</a></h2>
+<p>Want to dive deeper into P2P? Try implementing:</p>
+<ol>
+<li><strong>Encryption</strong>: Add message encryption for security</li>
+<li><strong>File Sharing</strong>: Send files between peers</li>
+<li><strong>Private Messaging</strong>: Direct peer-to-peer messages</li>
+<li><strong>Network Topology</strong>: Visualize peer connections</li>
+<li><strong>Performance Metrics</strong>: Measure message latency and throughput</li>
+<li><strong>Mobile Support</strong>: Make it work across different networks</li>
+</ol>
+<h2 id="-further-reading"><a class="header" href="#-further-reading">📚 Further Reading</a></h2>
+<ul>
+<li><strong>Distributed Systems</strong> by Maarten van Steen</li>
+<li><strong>Network Programming with Rust</strong> by Abhishek Chanda</li>
+<li><strong>The Rust Programming Language</strong> (networking chapters)</li>
+<li><strong>P2P Networking and Applications</strong> by Xuemin Shen</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="-p2p-networking-learning-summary"><a class="header" href="#-p2p-networking-learning-summary">🎓 P2P Networking Learning Summary</a></h1>
+<p>Congratulations! You've built a complete peer-to-peer Chat application in Rust. This document summarizes what you've learned and provides guidance for further exploration.</p>
+<h2 id="-what-ive-accomplished"><a class="header" href="#-what-ive-accomplished">🏆 What I've Accomplished</a></h2>
+<h3 id="-built-a-complete-p2p-application"><a class="header" href="#-built-a-complete-p2p-application">✅ Built a Complete P2P Application</a></h3>
+<ul>
+<li><strong>Peer Discovery</strong>: Automatic detection of peers on the network</li>
+<li><strong>Real-time Messaging</strong>: Instant message broadcasting to all peers</li>
+<li><strong>Decentralized Architecture</strong>: No central server required</li>
+<li><strong>Interactive CLI</strong>: User-friendly command-line interface</li>
+<li><strong>Robust Networking</strong>: Handles peer connections, failures, and recovery</li>
+</ul>
+<h3 id="-learned-core-p2p-concepts"><a class="header" href="#-learned-core-p2p-concepts">✅ Learned Core P2P Concepts</a></h3>
+<ol>
+<li><strong>Service Discovery</strong>: How peers find each other without a central directory</li>
+<li><strong>Direct Communication</strong>: Peer-to-peer message passing</li>
+<li><strong>Network Protocols</strong>: When to use UDP vs TCP</li>
+<li><strong>Async Programming</strong>: Concurrent network operations</li>
+<li><strong>Protocol Design</strong>: Creating structured message formats</li>
+<li><strong>Distributed Systems</strong>: Challenges of decentralized architecture</li>
+</ol>
+<h2 id="-technical-skills-gained"><a class="header" href="#-technical-skills-gained">🔍 Technical Skills Gained</a></h2>
+<h3 id="rust-programming"><a class="header" href="#rust-programming">Rust Programming</a></h3>
+<ul>
+<li><strong>Async/Await</strong>: Using <code>tokio</code> for concurrent operations</li>
+<li><strong>Network Programming</strong>: UDP and TCP socket programming</li>
+<li><strong>Error Handling</strong>: Robust error management in network code</li>
+<li><strong>Data Serialization</strong>: JSON message formatting with <code>serde</code></li>
+<li><strong>CLI Development</strong>: Command-line interfaces with <code>clap</code></li>
+</ul>
+<h3 id="network-programming"><a class="header" href="#network-programming">Network Programming</a></h3>
+<ul>
+<li><strong>UDP Broadcasting</strong>: Service discovery via broadcast messages</li>
+<li><strong>TCP Connections</strong>: Reliable peer-to-peer communication</li>
+<li><strong>Socket Programming</strong>: Low-level networking concepts</li>
+<li><strong>Protocol Design</strong>: Structured message formats</li>
+<li><strong>Concurrent I/O</strong>: Handling multiple network operations</li>
+</ul>
+<h3 id="distributed-systems"><a class="header" href="#distributed-systems">Distributed Systems</a></h3>
+<ul>
+<li><strong>Peer Discovery</strong>: Automatic network participant detection</li>
+<li><strong>Failure Handling</strong>: Dealing with network partitions and peer failures</li>
+<li><strong>Message Broadcasting</strong>: Efficient multi-peer communication</li>
+<li><strong>State Management</strong>: Maintaining distributed peer lists</li>
+<li><strong>Network Resilience</strong>: Building fault-tolerant systems</li>
+</ul>
+<h2 id="-real-world-applications"><a class="header" href="#-real-world-applications">🎯 Real-World Applications</a></h2>
+<p>The concepts we've learned apply to many real systems:</p>
+<h3 id="file-sharing-networks"><a class="header" href="#file-sharing-networks">File Sharing Networks</a></h3>
+<ul>
+<li><strong>BitTorrent</strong>: Decentralized file distribution</li>
+<li><strong>IPFS</strong>: Distributed file system</li>
+<li>Your Chat's peer discovery is similar to how these systems find file sources</li>
+</ul>
+<h3 id="communication-systems"><a class="header" href="#communication-systems">Communication Systems</a></h3>
+<ul>
+<li><strong>Skype (original)</strong>: Direct peer-to-peer calls</li>
+<li><strong>Discord</strong>: Hybrid P2P/server architecture</li>
+<li><strong>Mesh Networks</strong>: Disaster-resistant communication</li>
+</ul>
+<h3 id="blockchain--cryptocurrencies"><a class="header" href="#blockchain--cryptocurrencies">Blockchain &amp; Cryptocurrencies</a></h3>
+<ul>
+<li><strong>Bitcoin</strong>: Peer-to-peer transaction broadcasting</li>
+<li><strong>Ethereum</strong>: Distributed smart contract execution</li>
+<li>Your message broadcasting is similar to transaction propagation</li>
+</ul>
+<h3 id="gaming-networks"><a class="header" href="#gaming-networks">Gaming Networks</a></h3>
+<ul>
+<li><strong>Multiplayer Games</strong>: Direct player-to-player communication</li>
+<li><strong>LAN Gaming</strong>: Local network game discovery</li>
+<li>Your peer discovery mirrors game lobby systems</li>
+</ul>
+<h2 id="-next-learning-steps"><a class="header" href="#-next-learning-steps">🚀 Next Learning Steps</a></h2>
+<h3 id="immediate-enhancements-beginner"><a class="header" href="#immediate-enhancements-beginner">Immediate Enhancements (Beginner)</a></h3>
+<ol>
+<li><strong>Add Message History</strong>: Store and display past messages</li>
+<li><strong>Improve UI</strong>: Add colors, timestamps, better formatting</li>
+<li><strong>File Sharing</strong>: Send files between peers</li>
+<li><strong>Private Messages</strong>: Direct peer-to-peer messaging</li>
+</ol>
+<h3 id="intermediate-challenges"><a class="header" href="#intermediate-challenges">Intermediate Challenges</a></h3>
+<ol>
+<li><strong>Encryption</strong>: Add message encryption for security</li>
+<li><strong>NAT Traversal</strong>: Connect peers behind routers/firewalls</li>
+<li><strong>GUI Application</strong>: Build a graphical interface</li>
+<li><strong>Mobile Support</strong>: Port to mobile platforms</li>
+</ol>
+<h3 id="advanced-p2p-concepts"><a class="header" href="#advanced-p2p-concepts">Advanced P2P Concepts</a></h3>
+<ol>
+<li><strong>DHT (Distributed Hash Tables)</strong>: Scalable peer lookup</li>
+<li><strong>Consensus Algorithms</strong>: Agreement in distributed systems</li>
+<li><strong>Gossip Protocols</strong>: Efficient information spreading</li>
+<li><strong>Blockchain Implementation</strong>: Build a simple cryptocurrency</li>
+<li><strong>WebRTC</strong>: Browser-based P2P communication</li>
+</ol>
+<h2 id="-recommended-learning-resources"><a class="header" href="#-recommended-learning-resources">📚 Recommended Learning Resources</a></h2>
+<h3 id="books"><a class="header" href="#books">Books</a></h3>
+<ul>
+<li><strong>"Distributed Systems"</strong> by Maarten van Steen &amp; Andrew Tanenbaum</li>
+<li><strong>"Network Programming with Rust"</strong> by Abhishek Chanda</li>
+<li><strong>"Programming Rust"</strong> by Jim Blandy &amp; Jason Orendorff</li>
+<li><strong>"Designing Data-Intensive Applications"</strong> by Martin Kleppmann</li>
+</ul>
+<h3 id="online-resources"><a class="header" href="#online-resources">Online Resources</a></h3>
+<ul>
+<li><strong>Rust Async Book</strong>: https://rust-lang.github.io/async-book/</li>
+<li><strong>Tokio Tutorial</strong>: https://tokio.rs/tokio/tutorial</li>
+<li><strong>libp2p Documentation</strong>: https://docs.libp2p.io/</li>
+<li><strong>WebRTC Documentation</strong>: https://webrtc.org/</li>
+</ul>
+<h3 id="project-ideas"><a class="header" href="#project-ideas">Project Ideas</a></h3>
+<ol>
+<li><strong>Build a Blockchain</strong>: Implement a simple proof-of-work blockchain</li>
+<li><strong>Create a Mesh Network</strong>: Build a self-healing network topology</li>
+<li><strong>Develop a P2P Game</strong>: Multiplayer game with direct connections</li>
+<li><strong>Make a Torrent Client</strong>: Implement the BitTorrent protocol</li>
+<li><strong>Build a P2P Chat Room</strong>: Multi-room chat system</li>
+</ol>
+<h2 id="-code-architecture-insights"><a class="header" href="#-code-architecture-insights">🔧 Code Architecture Insights</a></h2>
+<h3 id="what-made-this-p2p-system-work"><a class="header" href="#what-made-this-p2p-system-work">What Made This P2P System Work</a></h3>
+<ol>
+<li><strong>Hybrid Architecture</strong>: UDP for discovery + TCP for reliability</li>
+<li><strong>Async Design</strong>: Concurrent handling of multiple network operations</li>
+<li><strong>Simple Protocol</strong>: JSON messages for easy debugging and extension</li>
+<li><strong>Stateless Discovery</strong>: No persistent state required for peer detection</li>
+<li><strong>Graceful Degradation</strong>: System continues working when peers leave</li>
+</ol>
+<h3 id="design-patterns-used"><a class="header" href="#design-patterns-used">Design Patterns Used</a></h3>
+<ul>
+<li><strong>Observer Pattern</strong>: Message broadcasting to multiple peers</li>
+<li><strong>Publisher-Subscriber</strong>: CLI events triggering network operations</li>
+<li><strong>State Machine</strong>: Peer lifecycle management</li>
+<li><strong>Command Pattern</strong>: CLI command processing</li>
+<li><strong>Async State Management</strong>: Shared state with Mutex and Arc</li>
+</ul>
+<h2 id="-key-takeaways"><a class="header" href="#-key-takeaways">🌟 Key Takeaways</a></h2>
+<h3 id="p2p-vs-client-server"><a class="header" href="#p2p-vs-client-server">P2P vs Client-Server</a></h3>
+<ul>
+<li><strong>P2P Advantages</strong>: No single point of failure, scales naturally, privacy</li>
+<li><strong>P2P Challenges</strong>: Coordination complexity, NAT traversal, security</li>
+<li><strong>When to Use P2P</strong>: Real-time communication, file sharing, gaming</li>
+</ul>
+<h3 id="network-programming-lessons"><a class="header" href="#network-programming-lessons">Network Programming Lessons</a></h3>
+<ul>
+<li><strong>UDP vs TCP</strong>: Use UDP for discovery, TCP for reliable data</li>
+<li><strong>Error Handling</strong>: Network operations will fail - plan for it</li>
+<li><strong>Async Programming</strong>: Essential for responsive network applications</li>
+<li><strong>Protocol Design</strong>: Keep it simple, make it extensible</li>
+</ul>
+<h3 id="rust-for-networking"><a class="header" href="#rust-for-networking">Rust for Networking</a></h3>
+<ul>
+<li><strong>Memory Safety</strong>: No buffer overflows in network code</li>
+<li><strong>Performance</strong>: Zero-cost abstractions for high-performance networking</li>
+<li><strong>Concurrency</strong>: Fearless concurrency with async/await</li>
+<li><strong>Ecosystem</strong>: Rich crate ecosystem for networking</li>
+</ul>
+<h2 id="-conclusion"><a class="header" href="#-conclusion">🎉 Conclusion</a></h2>
+<p>We've implemented:</p>
+<ul>
+<li>Automatic service discovery</li>
+<li>Reliable peer-to-peer communication</li>
+<li>Concurrent network programming</li>
+<li>User-friendly interfaces</li>
+<li>Robust error handling</li>
+</ul>
+<p>The concepts and code patterns you've learned form the foundation of many distributed systems. Whether you're interested in blockchain, gaming, file sharing, or communication systems, you now have the tools to build sophisticated P2P applications.</p>
+<p>Keep experimenting, keep building, and welcome to the world of distributed systems programming! 🚀</p>
+<hr />
+<p><em>"The best way to learn distributed systems is to build them. You've taken the first step - now keep going!"</em></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="-example-session-walkthrough"><a class="header" href="#-example-session-walkthrough">🎬 Example Session Walkthrough</a></h1>
+<p>This shows what happens when you run multiple instances of the P2P Chat.</p>
+<h2 id="terminal-1---alice"><a class="header" href="#terminal-1---alice">Terminal 1 - Alice</a></h2>
+<pre><code>$ ./target/release/p2p_chat start --port 8080 --name Alice
+
+🎙️  Starting P2P Chat...
+👤 Your ID: abc123-def456-ghi789
+📡 Your Name: Alice
+🔌 Listening on port: 8080
+🔗 TCP listener started on port 8080
+
+💬
+</code></pre>
+<h2 id="terminal-2---bob-started-5-seconds-later"><a class="header" href="#terminal-2---bob-started-5-seconds-later">Terminal 2 - Bob (started 5 seconds later)</a></h2>
+<pre><code>$ ./target/release/p2p_chat start --port 8081 --name Bob
+
+🎙️  Starting P2P Chat...
+👤 Your ID: xyz789-uvw456-rst123
+📡 Your Name: Bob
+🔌 Listening on port: 8081
+🔗 TCP listener started on port 8081
+
+💬
+</code></pre>
+<h2 id="after-discovery-alices-terminal"><a class="header" href="#after-discovery-alices-terminal">After Discovery (Alice's terminal)</a></h2>
+<pre><code>🔍 Discovered new peer: Bob (192.168.1.101)
+
+💬 /list
+👥 Discovered peers:
+  - Bob (xyz789-uvw456-rst123) at 192.168.1.101:8081
+
+💬 Hello Bob!
+📤 Message sent to 1 peer(s)
+</code></pre>
+<h2 id="bob-receives-the-message"><a class="header" href="#bob-receives-the-message">Bob Receives the Message</a></h2>
+<pre><code>📨 Alice says: Hello Bob!
+💬 Hey Alice! Nice to meet you!
+📤 Message sent to 1 peer(s)
+</code></pre>
+<h2 id="alice-receives-bobs-reply"><a class="header" href="#alice-receives-bobs-reply">Alice Receives Bob's Reply</a></h2>
+<pre><code>📨 Bob says: Hey Alice! Nice to meet you!
+💬
+</code></pre>
+<h2 id="adding-charlie-terminal-3"><a class="header" href="#adding-charlie-terminal-3">Adding Charlie (Terminal 3)</a></h2>
+<pre><code>$ ./target/release/p2p_chat_ start --port 8082 --name Charlie
+
+🎙️  Starting P2P Chat...
+👤 Your ID: pqr456-stu789-vwx123
+📡 Your Name: Charlie
+
+# After discovery...
+💬 /list
+👥 Discovered peers:
+  - Alice (abc123-def456-ghi789) at 192.168.1.100:8080
+  - Bob (xyz789-uvw456-rst123) at 192.168.1.101:8081
+
+💬 Hello everyone!
+📤 Message sent to 2 peer(s)
+</code></pre>
+<h2 id="all-terminals-receive-charlies-message"><a class="header" href="#all-terminals-receive-charlies-message">All Terminals Receive Charlie's Message</a></h2>
+<p>Alice's terminal:</p>
+<pre><code>🔍 Discovered new peer: Charlie (192.168.1.102)
+📨 Charlie says: Hello everyone!
+</code></pre>
+<p>Bob's terminal:</p>
+<pre><code>🔍 Discovered new peer: Charlie (192.168.1.102)
+📨 Charlie says: Hello everyone!
+</code></pre>
+<h2 id="network-diagram"><a class="header" href="#network-diagram">Network Diagram</a></h2>
+<pre><code>    Alice (8080)
+        |  \
+        |   \
+        |    \
+    Bob (8081)---Charlie (8082)
+
+UDP Discovery: All peers broadcast on port 9999
+TCP Messages: Direct peer-to-peer connections
+</code></pre>
+<h2 id="key-observations"><a class="header" href="#key-observations">Key Observations</a></h2>
+<ul>
+<li><strong>Automatic Discovery</strong>: Peers find each other without manual configuration</li>
+<li><strong>Direct Communication</strong>: Messages go peer-to-peer, not through a server</li>
+<li><strong>Broadcast Nature</strong>: One message reaches all connected peers</li>
+<li><strong>Real-time</strong>: Messages appear instantly in all terminals</li>
+<li><strong>Resilient</strong>: If one peer exits, others continue working</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>

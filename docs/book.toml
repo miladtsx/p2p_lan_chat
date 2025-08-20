@@ -1,0 +1,17 @@
+[book]
+title = "P2P Chat Documentation"
+author = "P2P Chat Contributors"
+description = "A comprehensive guide to the P2P Chat project: concepts, architecture, and learning outcomes."
+multilingual = false
+src = "src"
+
+[output.html]
+default-theme = "light"
+mathjax-support = false
+
+[preprocessor.links]
+# Enable automatic link checking
+
+[build]
+destination = "book"
+create-missing = true
