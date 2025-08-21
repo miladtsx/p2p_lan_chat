@@ -158,7 +158,7 @@
                         <h1 id="-example-session-walkthrough"><a class="header" href="#-example-session-walkthrough">🎬 Example Session Walkthrough</a></h1>
 <p>This shows what happens when you run multiple instances of the P2P Chat.</p>
 <h2 id="terminal-1---alice"><a class="header" href="#terminal-1---alice">Terminal 1 - Alice</a></h2>
-<pre><code>$ ./target/release/p2p_chat start --port 8080 --name Alice
+<pre><code>$ cargo run -- start --port 8080 --name Alice
 
 🎙️  Starting P2P Chat...
 👤 Your ID: abc123-def456-ghi789
@@ -169,7 +169,7 @@
 💬
 </code></pre>
 <h2 id="terminal-2---bob-started-5-seconds-later"><a class="header" href="#terminal-2---bob-started-5-seconds-later">Terminal 2 - Bob (started 5 seconds later)</a></h2>
-<pre><code>$ ./target/release/p2p_chat start --port 8081 --name Bob
+<pre><code>$ cargo run -- start --port 8081 --name Bob
 
 🎙️  Starting P2P Chat...
 👤 Your ID: xyz789-uvw456-rst123
@@ -199,7 +199,7 @@
 💬
 </code></pre>
 <h2 id="adding-charlie-terminal-3"><a class="header" href="#adding-charlie-terminal-3">Adding Charlie (Terminal 3)</a></h2>
-<pre><code>$ ./target/release/p2p_chat_ start --port 8082 --name Charlie
+<pre><code>$ cargo run -- start --port 8082 --name Charlie
 
 🎙️  Starting P2P Chat...
 👤 Your ID: pqr456-stu789-vwx123

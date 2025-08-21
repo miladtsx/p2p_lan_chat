@@ -315,8 +315,8 @@ tokio::select! {
 <li><strong>P2P Networking and Applications</strong> by Xuemin Shen</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-p2p-networking-learning-summary"><a class="header" href="#-p2p-networking-learning-summary">🎓 P2P Networking Learning Summary</a></h1>
-<p>Congratulations! You've built a complete peer-to-peer Chat application in Rust. This document summarizes what you've learned and provides guidance for further exploration.</p>
-<h2 id="-what-ive-accomplished"><a class="header" href="#-what-ive-accomplished">🏆 What I've Accomplished</a></h2>
+<p>We've built a complete peer-to-peer Chat application in Rust. This document summarizes what we've learned and provides guidance for further exploration.</p>
+<h2 id="-what-weve-accomplished"><a class="header" href="#-what-weve-accomplished">🏆 What we've Accomplished</a></h2>
 <h3 id="-built-a-complete-p2p-application"><a class="header" href="#-built-a-complete-p2p-application">✅ Built a Complete P2P Application</a></h3>
 <ul>
 <li><strong>Peer Discovery</strong>: Automatic detection of peers on the network</li>
@@ -365,7 +365,7 @@ tokio::select! {
 <ul>
 <li><strong>BitTorrent</strong>: Decentralized file distribution</li>
 <li><strong>IPFS</strong>: Distributed file system</li>
-<li>Your Chat's peer discovery is similar to how these systems find file sources</li>
+<li>Our Chat's peer discovery is similar to how these systems find file sources</li>
 </ul>
 <h3 id="communication-systems"><a class="header" href="#communication-systems">Communication Systems</a></h3>
 <ul>
@@ -377,13 +377,13 @@ tokio::select! {
 <ul>
 <li><strong>Bitcoin</strong>: Peer-to-peer transaction broadcasting</li>
 <li><strong>Ethereum</strong>: Distributed smart contract execution</li>
-<li>Your message broadcasting is similar to transaction propagation</li>
+<li>Our message broadcasting is similar to transaction propagation</li>
 </ul>
 <h3 id="gaming-networks"><a class="header" href="#gaming-networks">Gaming Networks</a></h3>
 <ul>
 <li><strong>Multiplayer Games</strong>: Direct player-to-player communication</li>
 <li><strong>LAN Gaming</strong>: Local network game discovery</li>
-<li>Your peer discovery mirrors game lobby systems</li>
+<li>Our peer discovery mirrors game lobby systems</li>
 </ul>
 <h2 id="-next-learning-steps"><a class="header" href="#-next-learning-steps">🚀 Next Learning Steps</a></h2>
 <h3 id="immediate-enhancements-beginner"><a class="header" href="#immediate-enhancements-beginner">Immediate Enhancements (Beginner)</a></h3>
@@ -423,7 +423,7 @@ tokio::select! {
 <li><strong>libp2p Documentation</strong>: https://docs.libp2p.io/</li>
 <li><strong>WebRTC Documentation</strong>: https://webrtc.org/</li>
 </ul>
-<h3 id="project-ideas"><a class="header" href="#project-ideas">Project Ideas</a></h3>
+<h3 id="similar-project-ideas"><a class="header" href="#similar-project-ideas">Similar Project Ideas</a></h3>
 <ol>
 <li><strong>Build a Blockchain</strong>: Implement a simple proof-of-work blockchain</li>
 <li><strong>Create a Mesh Network</strong>: Build a self-healing network topology</li>
@@ -478,14 +478,11 @@ tokio::select! {
 <li>User-friendly interfaces</li>
 <li>Robust error handling</li>
 </ul>
-<p>The concepts and code patterns you've learned form the foundation of many distributed systems. Whether you're interested in blockchain, gaming, file sharing, or communication systems, you now have the tools to build sophisticated P2P applications.</p>
-<p>Keep experimenting, keep building, and welcome to the world of distributed systems programming! 🚀</p>
-<hr />
-<p><em>"The best way to learn distributed systems is to build them. You've taken the first step - now keep going!"</em></p>
+<p>The concepts and code patterns we've learned form the foundation of many distributed systems. Whether we're interested in <strong>blockchain</strong>, <strong>gaming</strong>, <strong>file sharing</strong>, or <strong>communication systems</strong>, you now have the tools to build sophisticated P2P applications.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="-example-session-walkthrough"><a class="header" href="#-example-session-walkthrough">🎬 Example Session Walkthrough</a></h1>
 <p>This shows what happens when you run multiple instances of the P2P Chat.</p>
 <h2 id="terminal-1---alice"><a class="header" href="#terminal-1---alice">Terminal 1 - Alice</a></h2>
-<pre><code>$ ./target/release/p2p_chat start --port 8080 --name Alice
+<pre><code>$ cargo run -- start --port 8080 --name Alice
 
 🎙️  Starting P2P Chat...
 👤 Your ID: abc123-def456-ghi789
@@ -496,7 +493,7 @@ tokio::select! {
 💬
 </code></pre>
 <h2 id="terminal-2---bob-started-5-seconds-later"><a class="header" href="#terminal-2---bob-started-5-seconds-later">Terminal 2 - Bob (started 5 seconds later)</a></h2>
-<pre><code>$ ./target/release/p2p_chat start --port 8081 --name Bob
+<pre><code>$ cargo run -- start --port 8081 --name Bob
 
 🎙️  Starting P2P Chat...
 👤 Your ID: xyz789-uvw456-rst123
@@ -526,7 +523,7 @@ tokio::select! {
 💬
 </code></pre>
 <h2 id="adding-charlie-terminal-3"><a class="header" href="#adding-charlie-terminal-3">Adding Charlie (Terminal 3)</a></h2>
-<pre><code>$ ./target/release/p2p_chat_ start --port 8082 --name Charlie
+<pre><code>$ cargo run -- start --port 8082 --name Charlie
 
 🎙️  Starting P2P Chat...
 👤 Your ID: pqr456-stu789-vwx123

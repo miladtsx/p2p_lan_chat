@@ -5,7 +5,7 @@ This shows what happens when you run multiple instances of the P2P Chat.
 ## Terminal 1 - Alice
 
 ```
-$ ./target/release/p2p_chat start --port 8080 --name Alice
+$ cargo run -- start --port 8080 --name Alice
 
 🎙️  Starting P2P Chat...
 👤 Your ID: abc123-def456-ghi789
@@ -19,7 +19,7 @@ $ ./target/release/p2p_chat start --port 8080 --name Alice
 ## Terminal 2 - Bob (started 5 seconds later)
 
 ```
-$ ./target/release/p2p_chat start --port 8081 --name Bob
+$ cargo run -- start --port 8081 --name Bob
 
 🎙️  Starting P2P Chat...
 👤 Your ID: xyz789-uvw456-rst123
@@ -61,7 +61,7 @@ $ ./target/release/p2p_chat start --port 8081 --name Bob
 ## Adding Charlie (Terminal 3)
 
 ```
-$ ./target/release/p2p_chat_ start --port 8082 --name Charlie
+$ cargo run -- start --port 8082 --name Charlie
 
 🎙️  Starting P2P Chat...
 👤 Your ID: pqr456-stu789-vwx123
