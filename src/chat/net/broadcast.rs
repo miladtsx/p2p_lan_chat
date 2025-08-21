@@ -21,7 +21,7 @@ pub async fn broadcast_message(peer: &Peer, content: &str) -> Result<(), ChatErr
     let mut successful_sends = 0;
     for peer in peers.values() {
         if !peer.is_valid() {
-            eprintln!("Skipping invalid peer: {:?}", peer);
+            eprintln!("Skipping invalid peer: {peer:?}");
             continue;
         }
         if let Ok(mut stream) = TcpStream::connect((peer.ip, peer.port)).await {
@@ -31,7 +31,7 @@ pub async fn broadcast_message(peer: &Peer, content: &str) -> Result<(), ChatErr
         }
     }
     if successful_sends > 0 {
-        println!("📤 Message sent to {} peer(s)", successful_sends);
+        println!("📤 Message sent to {successful_sends} peer(s)");
     } else {
         println!("📭 No peers available to receive the message");
     }

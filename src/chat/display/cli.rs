@@ -55,7 +55,7 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
         match input {
             "/quit" => {
                 if let Err(e) = crate::chat::display::cli::broadcast_exit(peer).await {
-                    eprintln!("Error broadcasting exit: {}", e);
+                    eprintln!("Error broadcasting exit: {e}");
                 }
                 println!("\u{1F44B} Now Goodbye!");
                 std::process::exit(0);
@@ -68,7 +68,7 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
                     println!("👥 Discovered peers:");
                     for peer in peers.values() {
                         if !peer.is_valid() {
-                            println!("  - Invalid peer: {:?}", peer);
+                            println!("  - Invalid peer: {peer:?}");
                             continue;
                         }
                         println!(
@@ -85,7 +85,7 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
                     input
                 };
                 if let Err(e) = peer.broadcast_message(message_content).await {
-                    eprintln!("Failed to send message: {}", e);
+                    eprintln!("Failed to send message: {e}");
                 }
             }
         }

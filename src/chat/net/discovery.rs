@@ -23,7 +23,7 @@ pub async fn start_mdns(peer: Arc<Peer>) -> Result<(), ChatError> {
         let responder = match libmdns::Responder::new() {
             Ok(r) => r,
             Err(e) => {
-                eprintln!("[ERROR] Failed to create mDNS responder: {}", e);
+                eprintln!("[ERROR] Failed to create mDNS responder: {e}");
                 return;
             }
         };
@@ -112,18 +112,12 @@ pub async fn start_mdns(peer: Arc<Peer>) -> Result<(), ChatError> {
                 port: peer_port, // Use discovered port
             };
             if !peer_info.is_valid() {
-                eprint!(
-                    "⚠️  Warning: Discovered peer has invalid PeerInfo. {:?}",
-                    peer_info
-                );
+                eprint!("⚠️  Warning: Discovered peer has invalid PeerInfo. {peer_info:?}");
                 continue;
             }
             let mut peers = peer.peers.lock().await;
             if !peers.contains_key(&peer_info.id) {
-                println!(
-                    "🔍 Discovered peer via mDNS: {} at {}:{}",
-                    peer_name, ip, peer_port
-                );
+                println!("🔍 Discovered peer via mDNS: {peer_name} at {ip}:{peer_port}");
                 // Try to send our PeerInfo to the new peer via TCP
                 let my_info = PeerInfo {
                     id: peer.peer_id.clone(),
@@ -141,35 +135,29 @@ pub async fn start_mdns(peer: Arc<Peer>) -> Result<(), ChatError> {
                 let socket_addr = std::net::SocketAddr::new(ip, peer_port);
                 let msg_bytes = serde_json::to_vec(&msg).unwrap();
                 println!(
-                    "[DEBUG] Preparing to send discovery message to {}:{} (peer_id: {})",
-                    ip, peer_port, peer_id
+                    "[DEBUG] Preparing to send discovery message to {ip}:{peer_port} (peer_id: {peer_id})"
                 );
                 tokio::spawn(async move {
                     println!(
-                        "[DEBUG] Attempting TCP connection to {}:{} for discovery broadcast",
-                        ip, peer_port
+                        "[DEBUG] Attempting TCP connection to {ip}:{peer_port} for discovery broadcast"
                     );
                     match TcpStream::connect(socket_addr).await {
                         Ok(mut stream) => {
                             println!(
-                                "[DEBUG] Connected to {}:{}, sending discovery message...",
-                                ip, peer_port
+                                "[DEBUG] Connected to {ip}:{peer_port}, sending discovery message...",
                             );
                             match stream.write_all(&msg_bytes).await {
                                 Ok(_) => println!(
-                                    "[DEBUG] Discovery message sent successfully to {}:{}",
-                                    ip, peer_port
+                                    "[DEBUG] Discovery message sent successfully to {ip}:{peer_port}"
                                 ),
                                 Err(e) => eprintln!(
-                                    "[ERROR] Failed to send discovery message to {}:{}: {}",
-                                    ip, peer_port, e
+                                    "[ERROR] Failed to send discovery message to {ip}:{peer_port}: {e}",
                                 ),
                             }
                         }
                         Err(e) => {
                             eprintln!(
-                                "[ERROR] Could not connect to {}:{} for discovery: {}",
-                                ip, peer_port, e
+                                "[ERROR] Could not connect to {ip}:{peer_port} for discovery: {e}"
                             );
                         }
                     }

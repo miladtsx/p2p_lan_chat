@@ -12,7 +12,7 @@ pub async fn start_heartbeat(peer: &Peer) -> Result<(), ChatError> {
         let heartbeat = NetworkMessage::Heartbeat(peer.peer_id.clone());
         let msg_bytes = serde_json::to_vec(&heartbeat)?;
         if let Err(e) = socket.send_to(&msg_bytes, "255.255.255.255:9999").await {
-            eprintln!("Failed to send heartbeat: {}", e);
+            eprintln!("Failed to send heartbeat: {e}");
         }
         sleep(Duration::from_secs(10)).await;
     }

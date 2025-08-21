@@ -1,6 +1,6 @@
 //! Integration tests for end-to-end peer discovery and messaging in the P2P chat app.
 
-use std::io::{BufRead, BufReader, Read};
+use std::io::{BufRead, BufReader};
 use std::process::{Child, Command, Stdio};
 use std::thread;
 use std::time::Duration;
@@ -34,8 +34,8 @@ fn test_peer_discovery_and_message() {
     let start = std::time::Instant::now();
 
     // Move stdout and stderr out of alice so we can own them
-    let mut alice_stdout = alice.stdout.take().expect("No stdout");
-    let mut alice_stderr = alice.stderr.take().expect("No stderr");
+    let alice_stdout = alice.stdout.take().expect("No stdout");
+    let alice_stderr = alice.stderr.take().expect("No stderr");
     let mut stdout_reader = BufReader::new(alice_stdout);
     let mut stderr_reader = BufReader::new(alice_stderr);
 
@@ -82,7 +82,9 @@ fn test_peer_discovery_and_message() {
 
     // Clean up
     let _ = alice.kill();
+    let _ = alice.wait();
     let _ = bob.kill();
+    let _ = bob.wait();
 }
 
 #[test]
@@ -91,7 +93,7 @@ fn test_maximum_peer_discovery_limit() {
     let max_peers = 5;
     let mut children = vec![];
     for i in 0..max_peers + 1 {
-        let name = format!("Peer{}", i);
+        let name = format!("Peer-{i}");
         let port = 9100 + i as u16;
         children.push(spawn_peer(&name, port));
     }

@@ -7,7 +7,7 @@ pub async fn handle_signals(wt: Arc<Peer>) {
     let _ = signal::ctrl_c().await;
     // Call the quit procedure (same as /quit)
     if let Err(e) = broadcast_exit(&wt).await {
-        eprintln!("Error broadcasting exit: {}", e);
+        eprintln!("Error broadcasting exit: {e}");
     }
     println!("\u{1F44B} Now Goodbye!");
     std::process::exit(0);

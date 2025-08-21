@@ -28,7 +28,7 @@ pub async fn start_tcp_listener(peer: &Peer) -> Result<(), Box<dyn std::error::E
             if let Err(e) =
                 handle_tcp_connection(stream, addr, peers, message_sender, peer_id).await
             {
-                eprintln!("Error handling TCP connection from {}: {}", addr, e);
+                eprintln!("Error handling TCP connection from {addr}: {e}");
             }
         });
     }

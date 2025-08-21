@@ -54,7 +54,7 @@ pub async fn handle_tcp_connection(
                             }
                             // Validate discovered peer before adding
                             if !peer_info.is_valid() {
-                                eprintln!("Invalid peer info received via TCP: {:?}", peer_info);
+                                eprintln!("Invalid peer info received via TCP: {peer_info:?}");
                                 return Ok(());
                             }
                             let mut peers = peers.lock().await;
