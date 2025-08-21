@@ -13,6 +13,7 @@ fn spawn_peer(name: &str, port: u16) -> Child {
         .arg(name)
         .arg("--port")
         .arg(port.to_string())
+        .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
@@ -89,7 +90,7 @@ fn test_peer_discovery_and_message() {
 
 #[test]
 fn test_maximum_peer_discovery_limit() {
-    // Set a reasonable max for test (e.g. 5 peers)
+    // Set a reasonable max for test
     let max_peers = 5;
     let mut children = vec![];
     for i in 0..max_peers + 1 {
