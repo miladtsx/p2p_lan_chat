@@ -15,7 +15,7 @@ A text-based peer-to-peer Chat room built in Rust demonstrating P2P networking c
 Make sure you have Rust installed, then clone and build:
 
 ```bash
-git clone <your-repo>
+git clone https://github.com/miladtsx/p2p_lan_chat
 cd p2p
 cargo build --release
 ```
