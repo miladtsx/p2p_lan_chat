@@ -15,7 +15,7 @@ pub async fn broadcast_message(peer: &Peer, content: &str) -> Result<(), ChatErr
             .map_err(|e| ChatError::Unknown(e.to_string()))?
             .as_secs(),
     };
-    let network_msg = NetworkMessage::Chat(message.clone());
+    let network_msg = NetworkMessage::Chat(message);
     let msg_bytes = serde_json::to_vec(&network_msg)?;
     let peers = peer.peers.lock().await;
     let mut successful_sends = 0;

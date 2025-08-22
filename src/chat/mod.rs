@@ -105,7 +105,7 @@ impl Peer {
         Ok(())
     }
     pub async fn broadcast_message(&self, content: &str) -> Result<(), ChatError> {
-        net::broadcast::broadcast_message(self, content).await
+        net::broadcast::broadcast_message(&self, content).await
     }
 }
 
