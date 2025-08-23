@@ -7,6 +7,7 @@
 
 use serde::{Deserialize, Serialize};
 use std::net::IpAddr;
+use crate::crypto::SignedMessage;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PeerInfo {
@@ -34,6 +35,10 @@ pub struct Message {
     pub from_name: String,
     pub content: String,
     pub timestamp: u64,
+    /// Optional cryptographic signature for message authenticity
+    pub signature: Option<Vec<u8>>,
+    /// Optional public key of the signer
+    pub public_key: Option<Vec<u8>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -42,6 +47,14 @@ pub enum NetworkMessage {
     Chat(Message),
     Heartbeat(String), // peer_id
     Exit(String),      // peer_id
+    /// Signed message with cryptographic proof
+    SignedChat(SignedMessage),
+    /// Peer identity announcement with public key
+    IdentityAnnouncement {
+        peer_id: String,
+        name: String,
+        public_key: Vec<u8>,
+    },
 }
 
 #[cfg(test)]
@@ -88,6 +101,8 @@ mod tests {
             from_name: "Alice".to_string(),
             content: "Hello, world!".to_string(),
             timestamp: 1234567890,
+            signature: None,
+            public_key: None,
         };
         assert_eq!(msg.content, "Hello, world!");
         assert!(!msg.content.is_empty());
@@ -100,6 +115,8 @@ mod tests {
             from_name: "Bob".to_string(),
             content: "".to_string(),
             timestamp: 1234567890,
+            signature: None,
+            public_key: None,
         };
         assert!(msg.content.is_empty());
     }

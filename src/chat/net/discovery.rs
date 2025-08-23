@@ -164,6 +164,14 @@ pub async fn start_mdns(peer: Arc<Peer>) -> Result<(), ChatError> {
                 });
             }
             peers.insert(peer_info.id.clone(), peer_info);
+            
+            // Broadcast our identity to the newly discovered peer
+            let peer_clone = peer.clone();
+            tokio::spawn(async move {//TODO is this method safe? or should we have a separate trusted key manager?
+                if let Err(e) = crate::chat::net::broadcast::broadcast_identity(&peer_clone).await {
+                    eprintln!("Failed to broadcast identity to new peer: {e}");
+                }
+            });
         }
     }
     Ok(())

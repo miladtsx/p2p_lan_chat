@@ -19,6 +19,7 @@ pub mod display {
 
 use crate::error::ChatError;
 use crate::peer::PeerInfo;
+use crate::crypto::CryptoManager;
 use colored::*;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -32,6 +33,7 @@ pub struct Peer {
     pub port: u16,
     pub peers: Arc<Mutex<HashMap<String, PeerInfo>>>,
     pub message_sender: tokio::sync::broadcast::Sender<String>,
+    pub crypto_manager: Arc<CryptoManager>,
 }
 
 impl Peer {
@@ -46,12 +48,17 @@ impl Peer {
         let port = if port == 0 { 8080 } else { port };
         let peer_id = Uuid::new_v4().to_string();
         let (message_sender, _) = tokio::sync::broadcast::channel(100);
+        
+        // Initialize cryptographic identity
+        let crypto_manager = Arc::new(CryptoManager::new(peer_id.clone(), name.clone()));
+        
         Self {
             peer_id,
             name,
             port,
             peers: Arc::new(Mutex::new(HashMap::new())),
             message_sender,
+            crypto_manager,
         }
     }
     pub async fn start(&self) -> Result<(), Box<dyn std::error::Error>> {
@@ -62,6 +69,12 @@ impl Peer {
             "🔌 Listening on port: {}",
             self.port.to_string().bright_blue()
         );
+        
+        // Display cryptographic identity
+        let identity = self.crypto_manager.get_identity();
+        let public_key_hex = hex::encode(&identity.public_key);
+        println!("🔐 Your Public Key: {}", public_key_hex[..16].bright_magenta());
+        println!("🔐 Full Key: {}", public_key_hex.bright_magenta());
 
         // Start all services concurrently
         let tcp_listener = net::listener::start_tcp_listener(self);
@@ -105,7 +118,7 @@ impl Peer {
         Ok(())
     }
     pub async fn broadcast_message(&self, content: &str) -> Result<(), ChatError> {
-        net::broadcast::broadcast_message(&self, content).await
+        net::broadcast::broadcast_message(self, content).await
     }
 }
 

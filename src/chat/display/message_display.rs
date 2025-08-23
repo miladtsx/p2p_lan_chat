@@ -14,9 +14,7 @@ pub async fn start_message_display(peer: &Peer) -> Result<(), ChatError> {
     loop {
         match receiver.recv().await {
             Ok(message) => {
-                println!("\n📨 {message},");
-                print!("💬 ");
-                std::io::Write::flush(&mut std::io::stdout()).unwrap();
+                println!("\n📨 {message}");
             }
             Err(broadcast::error::RecvError::Closed) => break,
             Err(broadcast::error::RecvError::Lagged(_)) => {

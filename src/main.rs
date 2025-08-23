@@ -5,16 +5,9 @@
 //! communication over a network.
 
 use std::sync::Arc;
-mod chat;
-mod cli;
-mod error;
-mod network;
-mod peer;
-mod signal;
-
-use chat::Peer;
+use p2p_chat::chat::Peer;
+use p2p_chat::cli::*;
 use clap::Parser;
-use cli::*;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -29,7 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let chat_arc = Arc::new(chat);
             let chat_signal = chat_arc.clone();
             tokio::spawn(async move {
-                crate::signal::handle_signals(chat_signal).await;
+                p2p_chat::signal::handle_signals(chat_signal).await;
             });
             chat_arc.start().await?;
         }

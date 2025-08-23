@@ -10,6 +10,8 @@ pub enum ChatError {
     Serialization(String),
     #[error("Unknown error: {0}")]
     Unknown(String),
+    #[error("Crypto error: {0}")]
+    Crypto(#[from] crate::crypto::CryptoError),
 }
 
 impl From<std::io::Error> for ChatError {

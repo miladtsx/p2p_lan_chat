@@ -11,6 +11,7 @@ use crate::peer::NetworkMessage;
 use serde_json;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::TcpStream;
+use hex;
 
 pub async fn broadcast_exit(peer: &Peer) -> Result<(), ChatError> {
     let exit_msg = NetworkMessage::Exit(peer.peer_id.clone());
@@ -29,6 +30,7 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
     println!("\n📋 Commands:");
     println!("  /list    - List discovered peers");
     println!("  /msg <message> - Send message to all peers");
+    println!("  /crypto  - Show cryptographic information");
     println!("  /quit    - Quit the application");
     println!("  Just type any message to broadcast it!\n");
 
@@ -77,6 +79,15 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
                         );
                     }
                 }
+            }
+            "/crypto" => {
+                let identity = peer.crypto_manager.get_identity();
+                let public_key_hex = hex::encode(&identity.public_key);
+                println!("🔐 Cryptographic Identity:");
+                println!("  Peer ID: {}", identity.peer_id);
+                println!("  Name: {}", identity.name);
+                println!("  Public Key: {public_key_hex}");
+                println!("  Known Peer Keys: {}", peer.crypto_manager.known_peers_count().await);
             }
             _ => {
                 let message_content = if input.starts_with("/msg ") {

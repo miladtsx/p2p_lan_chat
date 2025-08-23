@@ -17,6 +17,9 @@ libmdns = "0.9.1"
 mdns = "3.0.0"
 thiserror = "1.0"
 env_logger = "0.11.8"
+ed25519-dalek = { version = "2.0", features = ["rand_core", "serde"] }
+rand = "0.8"
+hex = "0.4"
 
 [lib]
 name = "p2p_chat"
