@@ -32,6 +32,10 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
     println!("  /msg <message> - Send signed message to all peers");
     println!("  /unsigned <message> - Send unsigned message to all peers");
     println!("  /crypto  - Show cryptographic information");
+    println!("  /propose <description> - Propose secure-only messaging upgrade");
+    println!("  /vote <proposal_id> <approve|reject> - Vote on upgrade proposal");
+    println!("  /proposals - List active upgrade proposals");
+    println!("  /status  - Show security status and proposals");
     println!("  /quit    - Quit the application");
     println!("  Just type any message to broadcast it (signed by default)!\n");
 
@@ -55,7 +59,11 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
             println!("Input too long. Please keep messages under 512 characters.");
             continue;
         }
-        match input {
+
+        let mut parts = input.splitn(2, ' ');
+        let command = parts.next().unwrap();
+        let args = parts.next().unwrap_or("");
+        match command {
             "/quit" => {
                 if let Err(e) = crate::chat::display::cli::broadcast_exit(peer).await {
                     eprintln!("Error broadcasting exit: {e}");
@@ -90,12 +98,86 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
                 println!("  Public Key: {public_key_hex}");
                 println!("  Known Peer Keys: {}", peer.crypto_manager.known_peers_count().await);
             }
-            "/unsigned" => {
-                let message_content = if input.starts_with("/unsigned ") {
-                    input.strip_prefix("/unsigned ").unwrap()
+            "/propose" => {
+                let description = if args.is_empty() {
+                    "Enable secure-only messaging for all future communications"
                 } else {
-                    input
+                    args
                 };
+                
+                match peer.propose_secure_upgrade(description).await {
+                    Ok(proposal_id) => {
+                        println!("✅ Upgrade proposal created successfully!");
+                        println!("📋 Proposal ID: {}", proposal_id);
+                    }
+                    Err(e) => eprintln!("❌ Failed to create upgrade proposal: {e}"),
+                }
+            }
+            "/vote" => {
+                let parts: Vec<&str> = args.split_whitespace().collect();
+                if parts.len() != 2 {
+                    println!("❌ Usage: /vote <proposal_id> <approve|reject>");
+                    continue;
+                }
+                
+                let proposal_id = parts[0];
+                let vote_str = parts[1].to_lowercase();
+                
+                let the_vote = match vote_str.as_str() {
+                    "approve" | "yes" | "true" | "1" => true,
+                    "reject" | "no" | "false" | "0" => false,
+                    _ => {
+                        println!("❌ Invalid vote. Use 'approve' or 'reject'");
+                        continue;
+                    }
+                };
+                
+                match peer.vote_on_proposal(proposal_id, the_vote).await {
+                    Ok(()) => {
+                        let vote_text = if the_vote { "approved" } else { "rejected" };
+                        println!("✅ Successfully {} upgrade proposal: {}", vote_text, proposal_id);
+                    }
+                    Err(e) => eprintln!("❌ Failed to vote on upgrade proposal: {e}"),
+                }
+            }
+            "/proposals" => {
+                let proposals = peer.get_active_proposals().await;
+                if proposals.is_empty() {
+                    println!("📭 No active upgrade proposals");
+                } else {
+                    println!("🔐 Active Upgrade Proposals:");
+                    for proposal in proposals {
+                        println!("  📋 ID: {}", proposal.proposal_id);
+                        println!("    Proposed by: {} ({})", proposal.proposer_name, proposal.proposer_id);
+                        println!("    Description: {}", proposal.description);
+                        println!("    Required: {}/{} approvals", proposal.required_approvals, proposal.total_peers);
+                        println!("    Created: {}", proposal.timestamp);
+                        println!();
+                    }
+                }
+            }
+            "/status" => {
+                let secure_enabled = peer.is_secure_only_enabled().await;
+                let proposals = peer.get_active_proposals().await;
+                
+                println!("🔐 Security Status:");
+                println!("  Secure-only messaging: {}", if secure_enabled { "✅ ENABLED" } else { "❌ DISABLED" });
+                println!("  Active proposals: {}", proposals.len());
+                
+                if !proposals.is_empty() {
+                    println!("\n📋 Active Proposals:");
+                    for proposal in proposals {
+                        let votes = peer.get_proposal_votes(&proposal.proposal_id).await;
+                        let approval_count = votes.iter().filter(|v| v.approved).count();
+                        let rejection_count = votes.iter().filter(|v| !v.approved).count();
+                        
+                        println!("  📋 {}: {}/{} approvals, {} rejections", 
+                            proposal.proposal_id, approval_count, proposal.required_approvals, rejection_count);
+                    }
+                }
+            }
+            "/unsigned" => {
+                let message_content = args;
                 if let Err(e) = peer.broadcast_unsigned_message(message_content).await {
                     eprintln!("Failed to send unsigned message: {e}");
                 }

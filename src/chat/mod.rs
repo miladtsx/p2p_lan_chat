@@ -19,7 +19,7 @@ pub mod display {
 
 use crate::error::ChatError;
 use crate::peer::PeerInfo;
-use crate::crypto::CryptoManager;
+use crate::crypto::{CryptoManager, threshold::ThresholdManager};
 use colored::*;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -34,6 +34,7 @@ pub struct Peer {
     pub peers: Arc<Mutex<HashMap<String, PeerInfo>>>,
     pub message_sender: tokio::sync::broadcast::Sender<String>,
     pub crypto_manager: Arc<CryptoManager>,
+    pub threshold_manager: Arc<ThresholdManager>,
 }
 
 impl Peer {
@@ -52,6 +53,9 @@ impl Peer {
         // Initialize cryptographic identity
         let crypto_manager = Arc::new(CryptoManager::new(peer_id.clone(), name.clone()));
         
+        // Initialize threshold manager for secure-only messaging upgrades
+        let threshold_manager = Arc::new(ThresholdManager::new());
+        
         Self {
             peer_id,
             name,
@@ -59,6 +63,7 @@ impl Peer {
             peers: Arc::new(Mutex::new(HashMap::new())),
             message_sender,
             crypto_manager,
+            threshold_manager,
         }
     }
     pub async fn start(&self) -> Result<(), Box<dyn std::error::Error>> {
@@ -124,6 +129,62 @@ impl Peer {
     /// Broadcast a message without cryptographic signing
     pub async fn broadcast_unsigned_message(&self, content: &str) -> Result<(), ChatError> {
         net::broadcast::broadcast_unsigned_message(self, content).await
+    }
+
+    /// Create a proposal to enable secure-only messaging
+    pub async fn propose_secure_upgrade(&self, description: &str) -> Result<String, ChatError> {
+        let peers_count = self.peers.lock().await.len();
+        let required_approvals = (peers_count / 2) + 1; // Simple majority rule
+        
+        let proposal_id = self.threshold_manager.create_proposal(
+            self.peer_id.clone(),
+            self.name.clone(),
+            description.to_string(),
+            required_approvals,
+            peers_count + 1, // Include self
+        ).await?;
+        
+        // Broadcast the proposal to all peers
+        net::broadcast::broadcast_upgrade_proposal(self, &proposal_id).await?;
+        
+        println!("🔐 Created secure messaging upgrade proposal: {}", proposal_id);
+        println!("📊 Requires {}/{} approvals to enable", required_approvals, peers_count + 1);
+        
+        Ok(proposal_id)
+    }
+
+    /// Vote on an upgrade proposal
+    pub async fn vote_on_proposal(&self, proposal_id: &str, approved: bool) -> Result<(), ChatError> {
+        self.threshold_manager.cast_vote(
+            proposal_id,
+            self.peer_id.clone(),
+            self.name.clone(),
+            approved,
+            &self.crypto_manager,
+        ).await?;
+        
+        let vote_text = if approved { "✅ approved" } else { "❌ rejected" };
+        println!("🗳️  {} upgrade proposal: {}", vote_text, proposal_id);
+        
+        // Broadcast the vote to all peers
+        net::broadcast::broadcast_proposal_vote(self, proposal_id, approved).await?;
+        
+        Ok(())
+    }
+
+    /// Check if secure-only messaging is currently enabled
+    pub async fn is_secure_only_enabled(&self) -> bool {
+        self.threshold_manager.is_secure_only_enabled().await
+    }
+
+    /// Get active upgrade proposals
+    pub async fn get_active_proposals(&self) -> Vec<crate::crypto::threshold::UpgradeProposal> {
+        self.threshold_manager.get_active_proposals().await
+    }
+
+    /// Get votes for a specific proposal
+    pub async fn get_proposal_votes(&self, proposal_id: &str) -> Vec<crate::crypto::threshold::UpgradeVote> {
+        self.threshold_manager.get_proposal_votes(proposal_id).await
     }
 }
 

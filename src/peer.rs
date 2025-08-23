@@ -7,7 +7,7 @@
 
 use serde::{Deserialize, Serialize};
 use std::net::IpAddr;
-use crate::crypto::SignedMessage;
+use crate::crypto::{SignedMessage, threshold::{UpgradeProposal, UpgradeVote, PartialSignature}};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PeerInfo {
@@ -55,6 +55,12 @@ pub enum NetworkMessage {
         name: String,
         public_key: Vec<u8>,
     },
+    /// Upgrade proposal for secure-only messaging
+    UpgradeRequest(UpgradeProposal),
+    /// Vote on an upgrade proposal
+    UpgradeVote(UpgradeVote),
+    /// Partial signature for threshold approval
+    PartialSignature(PartialSignature),
 }
 
 #[cfg(test)]

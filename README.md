@@ -9,6 +9,9 @@ A text-based peer-to-peer Chat room built in Rust demonstrating P2P networking c
 - **Decentralized**: No central server required - peers communicate directly in LAN
 - **Simple CLI**: Easy-to-use command line interface
 - **Heartbeat System**: Keeps track of active peers
+- **🔐 Threshold Signatures**: M-of-N approval for secure-only messaging upgrades
+- **🔒 Cryptographic Security**: Ed25519 message signing and verification
+- **🛡️ Secure-Only Mode**: Optional enforcement of signed messages only
 
 ## 🛠️ Installation
 
@@ -43,6 +46,10 @@ Once running, you can use these commands:
 - **Send a message**: Just type your message and press Enter (signed by default)
 - **`/msg <message>`**: Alternative way to send a signed message
 - **`/unsigned <message>`**: Send a message without cryptographic signing
+- **`/propose <description>`**: Propose secure-only messaging upgrade
+- **`/vote <proposal_id> <approve|reject>`**: Vote on upgrade proposal
+- **`/proposals`**: List active upgrade proposals
+- **`/status`**: Show security status and proposals
 - **`/list`**: Show all discovered peers
 - **`/quit`**: Exit the application
 
@@ -76,6 +83,8 @@ Each instance will automatically discover the others and you can send messages b
 - **TCP port 8080+**: Reliable message delivery
 - **JSON serialization**: All network messages
 - **Async Rust**: Concurrent network operations
+- **🔐 Ed25519 cryptography**: Message signing and verification
+- **🗳️ Threshold voting**: M-of-N approval for security upgrades
 
 ### Core Components
 
@@ -94,6 +103,14 @@ Each instance will automatically discover the others and you can send messages b
 3. **Heartbeat System**
    - Peers send heartbeats every 10 seconds
    - Helps maintain awareness of active peers
+
+4. **🔐 Threshold Signature System**
+
+   - **Upgrade Proposals**: Any peer can propose enabling secure-only messaging
+   - **Voting Mechanism**: Peers vote on proposals with cryptographic signatures
+   - **Threshold Enforcement**: M-of-N approvals required (simple majority by default)
+   - **Secure-Only Mode**: Once enabled, all messages must be signed and verified
+   - **Automatic Enforcement**: System rejects unsigned messages when secure mode is active
 
 ### Network Protocols
 
@@ -144,6 +161,66 @@ struct Message {
 4. Message is sent as JSON over each connection
 5. Receiving peers display the message in their CLI
 
+## 🔐 Threshold Signature System
+
+The P2P Chat includes a sophisticated threshold signature system that allows the network to democratically upgrade to secure-only messaging. This ensures that no single peer can unilaterally change the security policy.
+
+### How It Works
+
+1. **Proposal Creation**: Any peer can propose enabling secure-only messaging
+2. **Voting Round**: All peers vote on the proposal (approve/reject)
+3. **Threshold Check**: System calculates if required approvals are met
+4. **Automatic Enforcement**: Once approved, all messages must be signed
+
+### Usage Examples
+
+#### Creating an Upgrade Proposal
+
+```bash
+# Propose enabling secure-only messaging
+/propose Enable secure-only messaging for all future communications
+
+# System will respond with:
+# ✅ Upgrade proposal created successfully!
+# 📋 Proposal ID: 123e4567-e89b-12d3-a456-426614174000
+# 📊 Requires 2/3 approvals to enable
+```
+
+#### Voting on Proposals
+
+```bash
+# Approve a proposal
+/vote 123e4567-e89b-12d3-a456-426614174000 approve
+
+# Reject a proposal
+/vote 123e4567-e89b-12d3-a456-426614174000 reject
+```
+
+#### Checking Status
+
+```bash
+# List active proposals
+/proposals
+
+# Show security status
+/status
+```
+
+### Security Features
+
+- **Cryptographic Signatures**: All votes are signed with Ed25519 keys
+- **Duplicate Prevention**: Each peer can only vote once per proposal
+- **Threshold Enforcement**: Simple majority rule (configurable)
+- **Automatic Mode Switch**: Secure-only mode activates immediately upon approval
+- **Message Rejection**: Unsigned messages are rejected when secure mode is active
+
+### Threshold Calculation
+
+The system uses a simple majority rule:
+- **Required Approvals**: `(total_peers / 2) + 1`
+- **Example**: In a 3-peer network, 2 approvals are required
+- **Example**: In a 5-peer network, 3 approvals are required
+
 ## 🐛 Troubleshooting
 
 ### Peers Not Discovering Each Other
@@ -157,6 +234,12 @@ struct Message {
 - Ensure peers have been discovered first (use `/list`)
 - Check that TCP ports are not blocked by firewall
 - Try restarting instances if connections seem stuck
+
+### Threshold Signature Issues
+
+- **Proposal not found**: Check the proposal ID with `/proposals`
+- **Vote rejected**: Ensure you haven't already voted on this proposal
+- **Secure mode not activating**: Verify threshold requirements are met with `/status`
 
 ### Permission Issues
 

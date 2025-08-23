@@ -2,6 +2,7 @@
 //! 
 //! This module provides Ed25519 key generation, message signing, and verification
 //! to ensure message authenticity and integrity in the peer-to-peer network.
+//! It also includes threshold signature support for secure-only messaging upgrades.
 
 use ed25519_dalek::{SigningKey, VerifyingKey, Signature, Signer, Verifier};
 use rand::rngs::OsRng;
@@ -9,6 +10,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
+
+pub mod threshold;
 
 /// Represents a cryptographic identity for a peer
 #[derive(Debug, Clone, Serialize, Deserialize)]

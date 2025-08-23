@@ -25,9 +25,18 @@ pub async fn start_tcp_listener(peer: &Peer) -> Result<(), Box<dyn std::error::E
         let peer_id = peer.peer_id.clone();
 
         let crypto_manager = peer.crypto_manager.clone();
+        let threshold_manager = peer.threshold_manager.clone();
         tokio::spawn(async move {
-            if let Err(e) =
-                handle_tcp_connection(stream, addr, peers, message_sender, peer_id, Some(crypto_manager)).await
+            if let Err(e) = handle_tcp_connection(
+                stream,
+                addr,
+                peers,
+                message_sender,
+                peer_id,
+                threshold_manager,
+                Some(crypto_manager),
+            )
+            .await
             {
                 eprintln!("Error handling TCP connection from {addr}: {e}");
             }
