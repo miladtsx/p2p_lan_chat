@@ -34,7 +34,6 @@ pub async fn start_mdns(peer: Arc<Peer>) -> Result<(), ChatError> {
             &[&format!("peer_id={}", peer_ad.peer_id), "app=p2pchat"],
         );
         loop {
-            println!("[DEBUG] SLEEP FOR BROADCAST");
             std::thread::sleep(std::time::Duration::from_secs(10));
         }
     });
