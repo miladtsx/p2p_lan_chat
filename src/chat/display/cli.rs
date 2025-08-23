@@ -29,10 +29,11 @@ pub async fn broadcast_exit(peer: &Peer) -> Result<(), ChatError> {
 pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
     println!("\n📋 Commands:");
     println!("  /list    - List discovered peers");
-    println!("  /msg <message> - Send message to all peers");
+    println!("  /msg <message> - Send signed message to all peers");
+    println!("  /unsigned <message> - Send unsigned message to all peers");
     println!("  /crypto  - Show cryptographic information");
     println!("  /quit    - Quit the application");
-    println!("  Just type any message to broadcast it!\n");
+    println!("  Just type any message to broadcast it (signed by default)!\n");
 
     let stdin = tokio::io::stdin();
     let mut reader = BufReader::new(stdin);
@@ -88,6 +89,16 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
                 println!("  Name: {}", identity.name);
                 println!("  Public Key: {public_key_hex}");
                 println!("  Known Peer Keys: {}", peer.crypto_manager.known_peers_count().await);
+            }
+            "/unsigned" => {
+                let message_content = if input.starts_with("/unsigned ") {
+                    input.strip_prefix("/unsigned ").unwrap()
+                } else {
+                    input
+                };
+                if let Err(e) = peer.broadcast_unsigned_message(message_content).await {
+                    eprintln!("Failed to send unsigned message: {e}");
+                }
             }
             _ => {
                 let message_content = if input.starts_with("/msg ") {

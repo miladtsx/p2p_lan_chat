@@ -73,6 +73,32 @@ You'll see output like:
 🔐 Full Key: a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
 ```
 
+### Sending Messages
+
+#### Signed Messages (Default)
+All regular messages are automatically signed:
+
+```
+💬 Hello, this message will be cryptographically signed!
+📤 Signed message sent to 2 peer(s)
+🔐 Message signed with Ed25519 for authenticity
+```
+
+#### Unsigned Messages
+You can also send messages without cryptographic signing:
+
+```
+💬 /unsigned This message will not be signed
+📤 Unsigned message sent to 2 peer(s)
+⚠️  Message sent without cryptographic signature
+```
+
+**Note**: Use unsigned messages when you want to:
+- Send messages quickly without cryptographic overhead
+- Test network connectivity
+- Send messages that don't require authenticity verification
+- Maintain backward compatibility with peers that don't support signatures
+
 ### Viewing Cryptographic Information
 
 Use the `/crypto` command to see your cryptographic identity:
@@ -86,16 +112,6 @@ Use the `/crypto` command to see your cryptographic identity:
   Known Peer Keys: 3
 ```
 
-### Sending Signed Messages
-
-All messages are automatically signed:
-
-```
-💬 Hello, this message will be cryptographically signed!
-📤 Signed message sent to 2 peer(s)
-🔐 Message signed with Ed25519 for authenticity
-```
-
 ### Receiving and Verifying Messages
 
 When you receive messages from other peers, they're automatically verified:
@@ -104,7 +120,23 @@ When you receive messages from other peers, they're automatically verified:
 🔐 Bob says (verified): Hello Alice!
 ⚠️  Charlie says (INVALID SIGNATURE): This message was tampered with
 ❓ Dave says (verification failed: Invalid signature): Hello
+📝 Eve says (unsigned): This message has no signature
 ```
+
+The verification process:
+1. Extracts the signature and public key from the message
+2. Reconstructs the original message hash (content + timestamp)
+3. Verifies the signature using the sender's public key
+4. Caches the public key for future verifications
+
+### Message Display Indicators
+
+Different message types are displayed with distinct indicators:
+
+- **🔐 Verified Messages**: Cryptographically signed and verified
+- **⚠️ Invalid Signature**: Signed but verification failed (possible tampering)
+- **❓ Verification Failed**: Signed but verification process failed
+- **📝 Unsigned Messages**: No cryptographic signature attached
 
 ## Security Features
 

@@ -120,6 +120,11 @@ impl Peer {
     pub async fn broadcast_message(&self, content: &str) -> Result<(), ChatError> {
         net::broadcast::broadcast_message(self, content).await
     }
+
+    /// Broadcast a message without cryptographic signing
+    pub async fn broadcast_unsigned_message(&self, content: &str) -> Result<(), ChatError> {
+        net::broadcast::broadcast_unsigned_message(self, content).await
+    }
 }
 
 #[cfg(test)]

@@ -64,6 +64,52 @@ pub async fn broadcast_message(peer: &Peer, content: &str) -> Result<(), ChatErr
     Ok(())
 }
 
+/// Broadcast a message without cryptographic signing
+pub async fn broadcast_unsigned_message(peer: &Peer, content: &str) -> Result<(), ChatError> {
+    let timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_err(|e| ChatError::Unknown(e.to_string()))?
+        .as_secs();
+
+    // Create an unsigned message (no signature or public key)
+    let unsigned_message = Message {
+        from_id: peer.peer_id.clone(),
+        from_name: peer.name.clone(),
+        content: content.to_string(),
+        timestamp,
+        signature: None,
+        public_key: None,
+    };
+    
+    let network_msg = NetworkMessage::Chat(unsigned_message);
+    let msg_bytes = serde_json::to_vec(&network_msg)?;
+    
+    let peers = peer.peers.lock().await;
+    let mut successful_sends = 0;
+    
+    for peer_info in peers.values() {
+        if !peer_info.is_valid() {
+            eprintln!("Skipping invalid peer: {peer_info:?}");
+            continue;
+        }
+        
+        if let Ok(mut stream) = TcpStream::connect((peer_info.ip, peer_info.port)).await {
+            if stream.write_all(&msg_bytes).await.is_ok() {
+                successful_sends += 1;
+            }
+        }
+    }
+    
+    if successful_sends > 0 {
+        println!("📤 Unsigned message sent to {successful_sends} peer(s)");
+        println!("⚠️  Message sent without cryptographic signature");
+        println!("📊 Message details: content='{content}', timestamp={timestamp}");
+    } else {
+        println!("📭 No peers available to receive the message");
+    }
+    Ok(())
+}
+
 /// Broadcast the peer's identity with public key to all known peers
 pub async fn broadcast_identity(peer: &Peer) -> Result<(), ChatError> {
     let identity = peer.crypto_manager.get_identity();

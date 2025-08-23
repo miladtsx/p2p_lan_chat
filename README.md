@@ -40,8 +40,9 @@ cargo run -- start --name "Alice" --port 8080
 
 Once running, you can use these commands:
 
-- **Send a message**: Just type your message and press Enter
-- **`/msg <message>`**: Alternative way to send a message
+- **Send a message**: Just type your message and press Enter (signed by default)
+- **`/msg <message>`**: Alternative way to send a signed message
+- **`/unsigned <message>`**: Send a message without cryptographic signing
 - **`/list`**: Show all discovered peers
 - **`/quit`**: Exit the application
 

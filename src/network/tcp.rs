@@ -77,15 +77,15 @@ pub async fn handle_tcp_connection(
                                         }
                                     }
                                 } else {
-                                    // No crypto manager, display as regular message
+                                    // No crypto manager, display as unsigned message
                                     let display_msg =
-                                        format!("{} says: {}", message.from_name, message.content);
+                                        format!("📝 {} says (unsigned): {}", message.from_name, message.content);
                                     let _ = message_sender.send(display_msg);
                                 }
                             } else {
-                                // No signature, display as regular message
+                                // No signature, display as unsigned message
                                 let display_msg =
-                                    format!("{} says: {}", message.from_name, message.content);
+                                    format!("📝 {} says (unsigned): {}", message.from_name, message.content);
                                 let _ = message_sender.send(display_msg);
                             }
                         }
