@@ -72,6 +72,15 @@ Each instance will automatically discover the others and you can send messages b
 - **Async Rust**: Concurrent networking with `tokio`
 - **Cryptography**: Ed25519 signatures for authenticity & integrity
 - **Threshold Voting**: M-of-N approval for secure mode
+- **Command Pattern**: Message handling uses a trait-based command dispatch for extensibility and clean code.
+
+### 🧩 Extending Message Types
+
+To add a new message type:
+1. Define your variant in `NetworkMessage`.
+2. Implement the `NetworkCommand` trait for your type in `src/network/command.rs`.
+3. Update the factory function to return your new command.
+This design makes it easy to add new features and keep message handling modular.
 
 ### Core Components
 

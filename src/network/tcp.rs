@@ -5,7 +5,7 @@
 //! It utilizes Tokio's asynchronous runtime for non-blocking I/O operations.
 
 use crate::error::ChatError;
-use crate::network::handlers;
+use crate::network::command::to_command;
 use crate::peer::{NetworkMessage, PeerInfo};
 use serde_json;
 use std::collections::HashMap;
@@ -31,70 +31,16 @@ pub async fn handle_tcp_connection(
             Ok(n) => {
                 if let Ok(network_msg) = serde_json::from_slice::<NetworkMessage>(&buf[..n]) {
                     println!("🔍 Received message: {network_msg:?}");
-                    match network_msg {
-                        NetworkMessage::Chat(message) => {
-                            handlers::chat::handle_chat_message(
-                                message,
-                                &message_sender,
-                                &crypto_manager,
-                            )
-                            .await
-                        }
-                        NetworkMessage::Exit(peer_id) => {
-                            handlers::peer::handle_exit(&peers, peer_id).await
-                        }
-                        NetworkMessage::Discovery(peer_info) => {
-                            handlers::peer::handle_discovery(&peers, peer_info, peer_id.clone())
-                                .await
-                        }
-                        NetworkMessage::Heartbeat(_) => {
-                            handlers::peer::handle_heartbeat().await;
-                        }
-                        NetworkMessage::SignedChat(signed_message) => {
-                            handlers::chat::handle_signed_chat(
-                                signed_message,
-                                &message_sender,
-                                &crypto_manager,
-                            )
-                            .await
-                        }
-                        NetworkMessage::IdentityAnnouncement {
-                            peer_id,
-                            name,
-                            public_key,
-                        } => {
-                            handlers::peer::handle_identity_announcement(
-                                peer_id,
-                                name,
-                                public_key,
-                                &crypto_manager,
-                            )
-                            .await
-                        }
-                        NetworkMessage::UpgradeRequest(proposal) => {
-                            handlers::upgrade::handle_upgrade_request(
-                                proposal,
-                                threshold_manager.clone(),
-                                &message_sender,
-                            )
-                            .await
-                        }
-                        NetworkMessage::UpgradeVote(vote) => {
-                            handlers::upgrade::handle_upgrade_vote(
-                                vote,
-                                threshold_manager.clone(),
-                                &message_sender,
-                            )
-                            .await
-                        }
-                        NetworkMessage::PartialSignature(partial_sig) => {
-                            handlers::upgrade::handle_partial_signature(
-                                partial_sig,
-                                &message_sender,
-                            )
-                            .await
-                        }
-                    }
+                    let command = to_command(network_msg);
+                    command
+                        .execute(
+                            peers.clone(),
+                            message_sender.clone(),
+                            peer_id.clone(),
+                            threshold_manager.clone(),
+                            crypto_manager.clone(),
+                        )
+                        .await?;
                 }
             }
             Err(e) => return Err(ChatError::Network(e.to_string())),
