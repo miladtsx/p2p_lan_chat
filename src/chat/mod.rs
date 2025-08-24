@@ -153,13 +153,9 @@ impl Peer {
         // Broadcast the proposal to all peers
         net::broadcast::broadcast_upgrade_proposal(self, &proposal_id).await?;
 
+        println!("🔐 Created secure messaging upgrade proposal: {proposal_id}");
         println!(
-            "🔐 Created secure messaging upgrade proposal: {}",
-            proposal_id
-        );
-        println!(
-            "📊 Requires {}/{} approvals to enable",
-            required_approvals,
+            "📊 Requires {required_approvals}/{} approvals to enable",
             peers_count + 1
         );
 
@@ -187,7 +183,7 @@ impl Peer {
         } else {
             "❌ rejected"
         };
-        println!("🗳️  {} upgrade proposal: {}", vote_text, proposal_id);
+        println!("🗳️  {vote_text} upgrade proposal: {proposal_id}");
 
         // Broadcast the vote to all peers
         net::broadcast::broadcast_proposal_vote(self, proposal_id, approved).await?;

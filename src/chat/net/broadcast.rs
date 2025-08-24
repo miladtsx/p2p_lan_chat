@@ -251,7 +251,7 @@ pub async fn broadcast_proposal_vote(peer: &Peer, proposal_id: &str, approved: b
     
     if successful_sends > 0 {
         let vote_text = if approved { "approval" } else { "rejection" };
-        println!("📤 Vote {} broadcast to {successful_sends} peer(s)", vote_text);
+        println!("📤 Vote {vote_text} broadcast to {successful_sends} peer(s)");
     }
     
     Ok(())

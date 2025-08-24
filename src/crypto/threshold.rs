@@ -220,7 +220,7 @@ impl ThresholdManager {
 
         // Create a signed vote if approved
         let signature = if approved {
-            let vote_data = format!("{}:{}:{}:{}", proposal_id, voter_id, approved, timestamp);
+            let vote_data = format!("{proposal_id}:{voter_id}:{approved}:{timestamp}");
             let signature = crypto_manager.sign_message(&vote_data, timestamp)?;
             Some(signature.signature)
         } else {
@@ -318,10 +318,7 @@ impl ThresholdManager {
         // Enable secure-only messaging
         *self.secure_only_enabled.write().await = true;
 
-        println!(
-            "🔐 Secure-only messaging activated by broadcast for proposal_id: {}",
-            proposal_id
-        );
+        println!("🔐 Secure-only messaging activated by broadcast for proposal_id: {proposal_id}");
     }
 
     /// Get all active proposals

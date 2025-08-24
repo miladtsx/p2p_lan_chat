@@ -108,7 +108,7 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
                 match peer.propose_secure_upgrade(description).await {
                     Ok(proposal_id) => {
                         println!("✅ Upgrade proposal created successfully!");
-                        println!("📋 Proposal ID: {}", proposal_id);
+                        println!("📋 Proposal ID: {proposal_id}");
                     }
                     Err(e) => eprintln!("❌ Failed to create upgrade proposal: {e}"),
                 }
@@ -135,7 +135,7 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
                 match peer.vote_on_proposal(proposal_id, the_vote).await {
                     Ok(()) => {
                         let vote_text = if the_vote { "approved" } else { "rejected" };
-                        println!("✅ Successfully {} upgrade proposal: {}", vote_text, proposal_id);
+                        println!("✅ Successfully {vote_text} upgrade proposal: {proposal_id}");
                     }
                     Err(e) => eprintln!("❌ Failed to vote on upgrade proposal: {e}"),
                 }
