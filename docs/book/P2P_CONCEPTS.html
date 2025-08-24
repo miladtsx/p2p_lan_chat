@@ -156,159 +156,39 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="-peer-to-peer-networking-concepts"><a class="header" href="#-peer-to-peer-networking-concepts">🌐 Peer-to-Peer Networking Concepts</a></h1>
-<p>This document explains the key P2P networking concepts demonstrated by our Chat application.</p>
-<h2 id="-what-is-peer-to-peer-p2p-networking"><a class="header" href="#-what-is-peer-to-peer-p2p-networking">🔍 What is Peer-to-Peer (P2P) Networking?</a></h2>
-<p>P2P networking is a distributed architecture where participants (peers) act as both clients and servers. Unlike traditional client-server models, there's no central authority - peers communicate directly with each other.</p>
-<h2 id="-key-p2p-concepts-demonstrated"><a class="header" href="#-key-p2p-concepts-demonstrated">🏗️ Key P2P Concepts Demonstrated</a></h2>
-<h3 id="1-peer-discovery"><a class="header" href="#1-peer-discovery">1. <strong>Peer Discovery</strong></a></h3>
-<p><strong>Problem</strong>: How do peers find each other without a central directory?</p>
-<p><strong>Our Solution</strong>: UDP Broadcasting</p>
+<h2 id="what-is-p2p"><a class="header" href="#what-is-p2p">What is P2P?</a></h2>
+<p>Distributed architecture: peers act as both clients and servers. No central authority.</p>
+<h2 id="key-concepts"><a class="header" href="#key-concepts">Key Concepts</a></h2>
 <ul>
-<li>Each peer broadcasts its presence on UDP port 9999</li>
-<li>Peers listen for these broadcasts and maintain a peer list</li>
-<li>No central server needed - fully decentralized discovery</li>
+<li>Peer Discovery: UDP broadcast, decentralized</li>
+<li>Direct Communication: TCP connections</li>
+<li>Broadcast Messaging: Send to all peers</li>
+<li>JSON Protocol: Structured messages</li>
+<li>Network Resilience: Heartbeat system</li>
 </ul>
-<pre><code>Peer A -----&gt; [UDP Broadcast] -----&gt; Network
-Peer B -----&gt; [UDP Broadcast] -----&gt; Network
-Peer C -----&gt; [UDP Broadcast] -----&gt; Network
-
-Each peer receives broadcasts from others and builds a peer list
-</code></pre>
-<h3 id="2-direct-communication"><a class="header" href="#2-direct-communication">2. <strong>Direct Communication</strong></a></h3>
-<p><strong>Problem</strong>: How do peers communicate reliably once discovered?</p>
-<p><strong>Our Solution</strong>: TCP Connections</p>
-<ul>
-<li>After discovery, peers connect directly via TCP</li>
-<li>Messages are sent point-to-point for reliability</li>
-<li>No intermediary servers - true P2P communication</li>
-</ul>
-<pre><code>Alice ---&gt; [TCP Message] ---&gt; Bob
-Alice ---&gt; [TCP Message] ---&gt; Charlie
-Bob   ---&gt; [TCP Message] ---&gt; Alice &amp; Charlie
-</code></pre>
-<h3 id="3-broadcast-messaging"><a class="header" href="#3-broadcast-messaging">3. <strong>Broadcast Messaging</strong></a></h3>
-<p><strong>Problem</strong>: How to send a message to all peers efficiently?</p>
-<p><strong>Our Solution</strong>: Multi-cast via Direct Connections</p>
-<ul>
-<li>When a user sends a message, it's sent to all known peers</li>
-<li>Each peer receives the message independently</li>
-<li>Similar to how P2P Chat work!</li>
-</ul>
-<h3 id="4-network-protocol-design"><a class="header" href="#4-network-protocol-design">4. <strong>Network Protocol Design</strong></a></h3>
-<p><strong>Problem</strong>: How do peers understand each other's messages?</p>
-<p><strong>Our Solution</strong>: JSON-based Message Protocol</p>
-<pre><code class="language-json">// Discovery Message
-{
-  "Discovery": {
-    "id": "uuid-string",
-    "name": "Alice",
-    "ip": "192.168.1.100",
-    "port": 8080
-  }
-}
-
-// Chat Message
-{
-  "Chat": {
-    "from_id": "uuid-string",
-    "from_name": "Alice",
-    "content": "Hello everyone!",
-    "timestamp": 1234567890
-  }
-}
-
-// Heartbeat Message
-{
-  "Heartbeat": "uuid-string"
-}
-</code></pre>
-<h3 id="5-network-resilience"><a class="header" href="#5-network-resilience">5. <strong>Network Resilience</strong></a></h3>
-<p><strong>Problem</strong>: How to handle peers joining and leaving?</p>
-<p><strong>Our Solution</strong>: Heartbeat System</p>
-<ul>
-<li>Peers send periodic heartbeat messages</li>
-<li>Failed connections indicate departed peers</li>
-<li>New peers are automatically discovered</li>
-</ul>
-<h2 id="-p2p-vs-client-server-comparison"><a class="header" href="#-p2p-vs-client-server-comparison">🎯 P2P vs Client-Server Comparison</a></h2>
-<div class="table-wrapper"><table><thead><tr><th>Aspect</th><th>P2P (P2P_Chat)</th><th>Client-Server</th></tr></thead><tbody>
-<tr><td><strong>Architecture</strong></td><td>Decentralized</td><td>Centralized</td></tr>
-<tr><td><strong>Failure Points</strong></td><td>No single point of failure</td><td>Server failure breaks everything</td></tr>
-<tr><td><strong>Scalability</strong></td><td>Scales with peers</td><td>Limited by server capacity</td></tr>
-<tr><td><strong>Discovery</strong></td><td>Peer-to-peer discovery</td><td>Central directory</td></tr>
-<tr><td><strong>Communication</strong></td><td>Direct peer connections</td><td>Through server</td></tr>
-<tr><td><strong>Complexity</strong></td><td>Higher (peer coordination)</td><td>Lower (server handles logic)</td></tr>
+<h2 id="p2p-vs-client-server"><a class="header" href="#p2p-vs-client-server">P2P vs Client-Server</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Aspect</th><th>P2P Chat</th><th>Client-Server</th></tr></thead><tbody>
+<tr><td>Architecture</td><td>Decentralized</td><td>Centralized</td></tr>
+<tr><td>Failure Points</td><td>No single point</td><td>Server failure breaks</td></tr>
+<tr><td>Scalability</td><td>Scales with peers</td><td>Limited by server</td></tr>
+<tr><td>Discovery</td><td>Peer-to-peer</td><td>Central directory</td></tr>
+<tr><td>Communication</td><td>Direct</td><td>Through server</td></tr>
 </tbody></table>
 </div>
-<h2 id="-technical-implementation-details"><a class="header" href="#-technical-implementation-details">🔧 Technical Implementation Details</a></h2>
-<h3 id="udp-broadcasting-for-discovery"><a class="header" href="#udp-broadcasting-for-discovery">UDP Broadcasting for Discovery</a></h3>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>// Send discovery broadcast
-let discovery_msg = NetworkMessage::Discovery(peer_info);
-socket.send_to(&amp;msg_bytes, "255.255.255.255:9999").await?;
-<span class="boring">}</span></code></pre></pre>
-<h3 id="tcp-for-reliable-messaging"><a class="header" href="#tcp-for-reliable-messaging">TCP for Reliable Messaging</a></h3>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>// Send message to specific peer
-let mut stream = TcpStream::connect((peer.ip, peer.port)).await?;
-stream.write_all(&amp;msg_bytes).await?;
-<span class="boring">}</span></code></pre></pre>
-<h3 id="async-concurrent-operations"><a class="header" href="#async-concurrent-operations">Async Concurrent Operations</a></h3>
-<pre><pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>// Run multiple network operations concurrently
-tokio::select! {
-    _ = tcp_listener =&gt; {},
-    _ = discovery_broadcaster =&gt; {},
-    _ = discovery_listener =&gt; {},
-    _ = heartbeat_sender =&gt; {},
-    _ = cli_handler =&gt; {},
-}
-<span class="boring">}</span></code></pre></pre>
-<h2 id="-real-world-p2p-examples"><a class="header" href="#-real-world-p2p-examples">🎮 Real-World P2P Examples</a></h2>
-<p>Our P2P_Chat demonstrates concepts used in:</p>
+<h2 id="technical-details"><a class="header" href="#technical-details">Technical Details</a></h2>
 <ul>
-<li><strong>BitTorrent</strong>: File sharing between peers</li>
-<li><strong>Skype</strong>: Direct voice/video calls (originally P2P)</li>
-<li><strong>Bitcoin</strong>: Decentralized cryptocurrency network</li>
-<li><strong>IPFS</strong>: Distributed file system</li>
-<li><strong>Mesh Networks</strong>: Disaster-resistant communication</li>
+<li>UDP for discovery</li>
+<li>TCP for messaging</li>
+<li>Async Rust (tokio)</li>
+<li>Ed25519 signatures</li>
 </ul>
-<h2 id="-advanced-p2p-concepts-to-explore"><a class="header" href="#-advanced-p2p-concepts-to-explore">🚀 Advanced P2P Concepts to Explore</a></h2>
-<ol>
-<li><strong>NAT Traversal</strong>: Connecting peers behind firewalls</li>
-<li><strong>DHT (Distributed Hash Tables)</strong>: Efficient peer lookup</li>
-<li><strong>Consensus Algorithms</strong>: Agreement in distributed systems</li>
-<li><strong>Gossip Protocols</strong>: Efficient information spread</li>
-<li><strong>Kademlia</strong>: Structured P2P overlay networks</li>
-<li><strong>Cryptographic Security</strong>: Secure P2P communication</li>
-</ol>
-<h2 id="-learning-outcomes"><a class="header" href="#-learning-outcomes">🎯 Learning Outcomes</a></h2>
-<p>By building this P2P_Chat, I've learned:</p>
-<p>✅ <strong>Peer Discovery</strong>: How peers find each other automatically<br />
-✅ <strong>Protocol Design</strong>: Creating message formats for P2P communication<br />
-✅ <strong>Network Programming</strong>: UDP vs TCP usage patterns<br />
-✅ <strong>Async Programming</strong>: Concurrent network operations in Rust<br />
-✅ <strong>Distributed Systems</strong>: Challenges of decentralized architecture<br />
-✅ <strong>Real-time Communication</strong>: Building interactive network applications</p>
-<h2 id="-next-steps"><a class="header" href="#-next-steps">🔮 Next Steps</a></h2>
-<p>Want to dive deeper into P2P? Try implementing:</p>
-<ol>
-<li><strong>Encryption</strong>: Add message encryption for security</li>
-<li><strong>File Sharing</strong>: Send files between peers</li>
-<li><strong>Private Messaging</strong>: Direct peer-to-peer messages</li>
-<li><strong>Network Topology</strong>: Visualize peer connections</li>
-<li><strong>Performance Metrics</strong>: Measure message latency and throughput</li>
-<li><strong>Mobile Support</strong>: Make it work across different networks</li>
-</ol>
-<h2 id="-further-reading"><a class="header" href="#-further-reading">📚 Further Reading</a></h2>
+<h2 id="real-world-examples"><a class="header" href="#real-world-examples">Real-World Examples</a></h2>
 <ul>
-<li><strong>Distributed Systems</strong> by Maarten van Steen</li>
-<li><strong>Network Programming with Rust</strong> by Abhishek Chanda</li>
-<li><strong>The Rust Programming Language</strong> (networking chapters)</li>
-<li><strong>P2P Networking and Applications</strong> by Xuemin Shen</li>
+<li>BitTorrent, Skype, Bitcoin, IPFS</li>
+</ul>
+<h2 id="next-steps"><a class="header" href="#next-steps">Next Steps</a></h2>
+<ul>
+<li>Encryption, file sharing, private messaging, mobile support</li>
 </ul>
 
                     </main>

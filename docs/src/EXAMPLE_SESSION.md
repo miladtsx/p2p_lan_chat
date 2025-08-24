@@ -1,6 +1,6 @@
 # 🎬 Example Session Walkthrough
 
-This shows what happens when you run multiple instances of the P2P Chat.
+This walkthrough shows how P2P Chat works with multiple peers.
 
 ## Terminal 1 - Alice
 
@@ -30,15 +30,17 @@ $ cargo run -- start --port 8081 --name Bob
 💬
 ```
 
-## After Discovery (Alice's terminal)
+## Peer Discovery (Alice's terminal)
 
 ```
 🔍 Discovered new peer: Bob (192.168.1.101)
-
 💬 /list
 👥 Discovered peers:
   - Bob (xyz789-uvw456-rst123) at 192.168.1.101:8081
+```
 
+## Messaging from Alice to Bob
+```
 💬 Hello Bob!
 📤 Message sent to 1 peer(s)
 ```
@@ -86,20 +88,13 @@ Alice's terminal:
 📨 Charlie says: Hello everyone!
 ```
 
-Bob's terminal:
-
-```
-🔍 Discovered new peer: Charlie (192.168.1.102)
-📨 Charlie says: Hello everyone!
-```
-
 ## Network Diagram
 
 ```
     Alice (8080)
-        |  \
-        |   \
-        |    \
+        |  \\
+        |   \\
+        |    \\
     Bob (8081)---Charlie (8082)
 
 UDP Discovery: All peers broadcast on port 9999
@@ -108,8 +103,8 @@ TCP Messages: Direct peer-to-peer connections
 
 ## Key Observations
 
-- **Automatic Discovery**: Peers find each other without manual configuration
-- **Direct Communication**: Messages go peer-to-peer, not through a server
-- **Broadcast Nature**: One message reaches all connected peers
-- **Real-time**: Messages appear instantly in all terminals
-- **Resilient**: If one peer exits, others continue working
+- Peers auto-discover via UDP
+- Messages are sent directly over TCP
+- No central server
+- Secure messaging and threshold voting supported
+- CLI commands for messaging, proposals, voting, and status

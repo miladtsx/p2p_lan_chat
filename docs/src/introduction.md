@@ -1,5 +1,18 @@
 # P2P Chat Documentation
 
-Welcome to the documentation for the P2P Chat project! This book covers the concepts, learning outcomes, and example sessions for the peer-to-peer chat application written in Rust.
+A concise guide to the P2P Chat project in Rust.
 
-Use the navigation to explore concepts, summaries, and walkthroughs.
+## Features
+- Automatic peer discovery (UDP)
+- Real-time messaging (TCP)
+- Decentralized, no server
+- CLI interface
+- Heartbeat system
+- Threshold voting for secure-only messaging
+- Ed25519 cryptographic security
+
+## How It Works
+- Peers broadcast presence via UDP
+- Direct TCP connections for messages
+- CLI commands for messaging, proposals, voting, and status
+- Secure-only mode: unsigned messages rejected after threshold approval

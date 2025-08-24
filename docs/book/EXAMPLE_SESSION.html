@@ -156,7 +156,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="-example-session-walkthrough"><a class="header" href="#-example-session-walkthrough">🎬 Example Session Walkthrough</a></h1>
-<p>This shows what happens when you run multiple instances of the P2P Chat.</p>
+<p>This walkthrough shows how P2P Chat works with multiple peers.</p>
 <h2 id="terminal-1---alice"><a class="header" href="#terminal-1---alice">Terminal 1 - Alice</a></h2>
 <pre><code>$ cargo run -- start --port 8080 --name Alice
 
@@ -179,14 +179,14 @@
 
 💬
 </code></pre>
-<h2 id="after-discovery-alices-terminal"><a class="header" href="#after-discovery-alices-terminal">After Discovery (Alice's terminal)</a></h2>
+<h2 id="peer-discovery-alices-terminal"><a class="header" href="#peer-discovery-alices-terminal">Peer Discovery (Alice's terminal)</a></h2>
 <pre><code>🔍 Discovered new peer: Bob (192.168.1.101)
-
 💬 /list
 👥 Discovered peers:
   - Bob (xyz789-uvw456-rst123) at 192.168.1.101:8081
-
-💬 Hello Bob!
+</code></pre>
+<h2 id="messaging-from-alice-to-bob"><a class="header" href="#messaging-from-alice-to-bob">Messaging from Alice to Bob</a></h2>
+<pre><code>💬 Hello Bob!
 📤 Message sent to 1 peer(s)
 </code></pre>
 <h2 id="bob-receives-the-message"><a class="header" href="#bob-receives-the-message">Bob Receives the Message</a></h2>
@@ -219,15 +219,11 @@
 <pre><code>🔍 Discovered new peer: Charlie (192.168.1.102)
 📨 Charlie says: Hello everyone!
 </code></pre>
-<p>Bob's terminal:</p>
-<pre><code>🔍 Discovered new peer: Charlie (192.168.1.102)
-📨 Charlie says: Hello everyone!
-</code></pre>
 <h2 id="network-diagram"><a class="header" href="#network-diagram">Network Diagram</a></h2>
 <pre><code>    Alice (8080)
-        |  \
-        |   \
-        |    \
+        |  \\
+        |   \\
+        |    \\
     Bob (8081)---Charlie (8082)
 
 UDP Discovery: All peers broadcast on port 9999
@@ -235,11 +231,11 @@ TCP Messages: Direct peer-to-peer connections
 </code></pre>
 <h2 id="key-observations"><a class="header" href="#key-observations">Key Observations</a></h2>
 <ul>
-<li><strong>Automatic Discovery</strong>: Peers find each other without manual configuration</li>
-<li><strong>Direct Communication</strong>: Messages go peer-to-peer, not through a server</li>
-<li><strong>Broadcast Nature</strong>: One message reaches all connected peers</li>
-<li><strong>Real-time</strong>: Messages appear instantly in all terminals</li>
-<li><strong>Resilient</strong>: If one peer exits, others continue working</li>
+<li>Peers auto-discover via UDP</li>
+<li>Messages are sent directly over TCP</li>
+<li>No central server</li>
+<li>Secure messaging and threshold voting supported</li>
+<li>CLI commands for messaging, proposals, voting, and status</li>
 </ul>
 
                     </main>
