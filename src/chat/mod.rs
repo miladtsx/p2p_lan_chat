@@ -17,9 +17,9 @@ pub mod display {
     pub mod message_display;
 }
 
+use crate::crypto::{threshold::ThresholdManager, CryptoManager};
 use crate::error::ChatError;
 use crate::peer::PeerInfo;
-use crate::crypto::{CryptoManager, threshold::ThresholdManager};
 use colored::*;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -49,13 +49,13 @@ impl Peer {
         let port = if port == 0 { 8080 } else { port };
         let peer_id = Uuid::new_v4().to_string();
         let (message_sender, _) = tokio::sync::broadcast::channel(100);
-        
+
         // Initialize cryptographic identity
         let crypto_manager = Arc::new(CryptoManager::new(peer_id.clone(), name.clone()));
-        
+
         // Initialize threshold manager for secure-only messaging upgrades
         let threshold_manager = Arc::new(ThresholdManager::new());
-        
+
         Self {
             peer_id,
             name,
@@ -74,11 +74,14 @@ impl Peer {
             "🔌 Listening on port: {}",
             self.port.to_string().bright_blue()
         );
-        
+
         // Display cryptographic identity
         let identity = self.crypto_manager.get_identity();
         let public_key_hex = hex::encode(&identity.public_key);
-        println!("🔐 Your Public Key: {}", public_key_hex[..16].bright_magenta());
+        println!(
+            "🔐 Your Public Key: {}",
+            public_key_hex[..16].bright_magenta()
+        );
         println!("🔐 Full Key: {}", public_key_hex.bright_magenta());
 
         // Start all services concurrently
@@ -92,31 +95,31 @@ impl Peer {
             result = tcp_listener => {
                 if let Err(e) = result {
                     eprintln!("TCP listener error: {e}");
-                    std::process::exit(1);
+                    self.shutdown().await;
                 }
             }
             result = mdns_discovery => {
                 if let Err(e) = result {
                     eprintln!("mDNS discovery error: {e}");
-                    std::process::exit(1);
+                    self.shutdown().await;
                 }
             }
             result = heartbeat_sender => {
                 if let Err(e) = result {
                     eprintln!("Heartbeat sender error: {e}");
-                    std::process::exit(1);
+                    self.shutdown().await;
                 }
             }
             result = cli_handler => {
                 if let Err(e) = result {
                     eprintln!("CLI handler error: {e}");
-                    std::process::exit(1);
+                    self.shutdown().await;
                 }
             }
             result = message_display => {
                 if let Err(e) = result {
                     eprintln!("Message display error: {e}");
-                    std::process::exit(1);
+                    self.shutdown().await;
                 }
             }
         }
@@ -135,40 +138,60 @@ impl Peer {
     pub async fn propose_secure_upgrade(&self, description: &str) -> Result<String, ChatError> {
         let peers_count = self.peers.lock().await.len();
         let required_approvals = (peers_count / 2) + 1; // Simple majority rule
-        
-        let proposal_id = self.threshold_manager.create_proposal(
-            self.peer_id.clone(),
-            self.name.clone(),
-            description.to_string(),
-            required_approvals,
-            peers_count + 1, // Include self
-        ).await?;
-        
+
+        let proposal_id = self
+            .threshold_manager
+            .create_proposal(
+                self.peer_id.clone(),
+                self.name.clone(),
+                description.to_string(),
+                required_approvals,
+                peers_count + 1, // Include self
+            )
+            .await?;
+
         // Broadcast the proposal to all peers
         net::broadcast::broadcast_upgrade_proposal(self, &proposal_id).await?;
-        
-        println!("🔐 Created secure messaging upgrade proposal: {}", proposal_id);
-        println!("📊 Requires {}/{} approvals to enable", required_approvals, peers_count + 1);
-        
+
+        println!(
+            "🔐 Created secure messaging upgrade proposal: {}",
+            proposal_id
+        );
+        println!(
+            "📊 Requires {}/{} approvals to enable",
+            required_approvals,
+            peers_count + 1
+        );
+
         Ok(proposal_id)
     }
 
     /// Vote on an upgrade proposal
-    pub async fn vote_on_proposal(&self, proposal_id: &str, approved: bool) -> Result<(), ChatError> {
-        self.threshold_manager.cast_vote(
-            proposal_id,
-            self.peer_id.clone(),
-            self.name.clone(),
-            approved,
-            &self.crypto_manager,
-        ).await?;
-        
-        let vote_text = if approved { "✅ approved" } else { "❌ rejected" };
+    pub async fn vote_on_proposal(
+        &self,
+        proposal_id: &str,
+        approved: bool,
+    ) -> Result<(), ChatError> {
+        self.threshold_manager
+            .cast_vote(
+                proposal_id,
+                self.peer_id.clone(),
+                self.name.clone(),
+                approved,
+                &self.crypto_manager,
+            )
+            .await?;
+
+        let vote_text = if approved {
+            "✅ approved"
+        } else {
+            "❌ rejected"
+        };
         println!("🗳️  {} upgrade proposal: {}", vote_text, proposal_id);
-        
+
         // Broadcast the vote to all peers
         net::broadcast::broadcast_proposal_vote(self, proposal_id, approved).await?;
-        
+
         Ok(())
     }
 
@@ -183,8 +206,23 @@ impl Peer {
     }
 
     /// Get votes for a specific proposal
-    pub async fn get_proposal_votes(&self, proposal_id: &str) -> Vec<crate::crypto::threshold::UpgradeVote> {
+    pub async fn get_proposal_votes(
+        &self,
+        proposal_id: &str,
+    ) -> Vec<crate::crypto::threshold::UpgradeVote> {
         self.threshold_manager.get_proposal_votes(proposal_id).await
+    }
+
+    pub async fn shutdown(&self) {
+        let _ = crate::chat::display::cli::broadcast_exit(self).await;
+
+        // TODO: Wait for all network tasks to finish (e.g., join handles)
+        // TODO: Close all open connections and resources
+        // You may want to set a shutdown flag and notify background tasks
+        println!("Peer is shutting down gracefully...");
+        // Give some time for messages to flush
+        tokio::time::sleep(std::time::Duration::from_millis(300)).await;
+        std::process::exit(0);
     }
 }
 

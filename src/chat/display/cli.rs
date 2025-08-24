@@ -69,7 +69,7 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
                     eprintln!("Error broadcasting exit: {e}");
                 }
                 println!("\u{1F44B} Now Goodbye!");
-                std::process::exit(0);
+                peer.shutdown().await;
             }
             "/list" => {
                 let peers = peer.peers.lock().await;
