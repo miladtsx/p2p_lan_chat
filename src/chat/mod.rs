@@ -54,7 +54,7 @@ impl Peer {
         let crypto_manager = Arc::new(CryptoManager::new(peer_id.clone(), name.clone()));
 
         // Initialize threshold manager for secure-only messaging upgrades
-        let threshold_manager = Arc::new(ThresholdManager::new());
+        let threshold_manager = Arc::new(ThresholdManager::default());
 
         Self {
             peer_id,

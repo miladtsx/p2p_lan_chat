@@ -10,7 +10,7 @@ use p2p_chat::crypto::CryptoManager;
 #[tokio::test]
 async fn test_complete_upgrade_lifecycle() {
     // Create a threshold manager
-    let threshold_manager = ThresholdManager::new();
+    let threshold_manager = ThresholdManager::default();
     
     // Create a crypto manager for signing
     let crypto_manager = CryptoManager::new("test-peer".to_string(), "TestPeer".to_string());
@@ -77,7 +77,7 @@ async fn test_complete_upgrade_lifecycle() {
 
 #[tokio::test]
 async fn test_proposal_rejection() {
-    let threshold_manager = ThresholdManager::new();
+    let threshold_manager = ThresholdManager::default();
     let crypto_manager = CryptoManager::new("test-peer".to_string(), "TestPeer".to_string());
     
     // Create a proposal requiring 2 approvals from 3 peers
@@ -125,7 +125,7 @@ async fn test_proposal_rejection() {
 
 #[tokio::test]
 async fn test_duplicate_voting_prevention() {
-    let threshold_manager = ThresholdManager::new();
+    let threshold_manager = ThresholdManager::default();
     let crypto_manager = CryptoManager::new("test-peer".to_string(), "TestPeer".to_string());
     
     let proposal_id = threshold_manager.create_proposal(
@@ -163,7 +163,7 @@ async fn test_duplicate_voting_prevention() {
 
 #[tokio::test]
 async fn test_multiple_proposals() {
-    let threshold_manager = ThresholdManager::new();
+    let threshold_manager = ThresholdManager::default();
     let crypto_manager = CryptoManager::new("test-peer".to_string(), "TestPeer".to_string());
     
     // Create first proposal

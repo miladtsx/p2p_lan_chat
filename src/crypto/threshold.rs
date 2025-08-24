@@ -89,6 +89,18 @@ pub struct ThresholdManager {
     secure_only_enabled: Arc<RwLock<bool>>,
 }
 
+impl Default for ThresholdManager {
+    fn default() -> Self {
+        Self {
+            proposals: Arc::new(RwLock::new(HashMap::new())),
+            votes: Arc::new(RwLock::new(HashMap::new())),
+            partial_signatures: Arc::new(RwLock::new(HashMap::new())),
+            proposal_states: Arc::new(RwLock::new(HashMap::new())),
+            secure_only_enabled: Arc::new(RwLock::new(false)),
+        }
+    }
+}
+
 impl ThresholdManager {
     /// Insert a received proposal if not present
     pub async fn insert_received_proposal(&self, proposal: UpgradeProposal) {
@@ -110,16 +122,6 @@ impl ThresholdManager {
                 .write()
                 .await
                 .insert(proposal.proposal_id.clone(), ProposalState::Open);
-        }
-    }
-    /// Create a new threshold manager
-    pub fn new() -> Self {
-        Self {
-            proposals: Arc::new(RwLock::new(HashMap::new())),
-            votes: Arc::new(RwLock::new(HashMap::new())),
-            partial_signatures: Arc::new(RwLock::new(HashMap::new())),
-            proposal_states: Arc::new(RwLock::new(HashMap::new())),
-            secure_only_enabled: Arc::new(RwLock::new(false)),
         }
     }
 
@@ -364,7 +366,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_proposal_creation() {
-        let manager = ThresholdManager::new();
+        let manager = ThresholdManager::default();
 
         let proposal_id = manager
             .create_proposal(
@@ -386,7 +388,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_voting_and_threshold() {
-        let manager = ThresholdManager::new();
+        let manager = ThresholdManager::default();
         let crypto_manager = CryptoManager::new("test-peer".to_string(), "TestPeer".to_string());
 
         let proposal_id = manager
@@ -434,7 +436,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_duplicate_voting_prevention() {
-        let manager = ThresholdManager::new();
+        let manager = ThresholdManager::default();
         let crypto_manager = CryptoManager::new("test-peer".to_string(), "TestPeer".to_string());
 
         let proposal_id = manager
