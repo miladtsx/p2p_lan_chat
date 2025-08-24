@@ -34,7 +34,7 @@ pub async fn start_tcp_listener(peer: &Peer) -> Result<(), Box<dyn std::error::E
                 message_sender,
                 peer_id,
                 threshold_manager,
-                Some(crypto_manager),
+                crypto_manager,
             )
             .await
             {
