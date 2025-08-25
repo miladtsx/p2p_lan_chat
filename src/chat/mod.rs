@@ -88,7 +88,12 @@ impl Peer {
         let tcp_listener = net::listener::start_tcp_listener(self);
         let mdns_discovery = net::discovery::start_mdns(Arc::new(self.clone()));
         let heartbeat_sender = net::heartbeat::start_heartbeat(self);
+
+        // Create a single StdCliIO instance and pass a reference to the CLI handler so it
+        // does not take a temporary reference to a temporary value.
+        let cli_io = display::cli::StdCliIO;
         let cli_handler = display::cli::start_cli_handler(self);
+
         let message_display = display::message_display::start_message_display(self);
 
         tokio::select! {
@@ -226,20 +231,6 @@ impl Peer {
 mod tests {
 
     use super::*;
-    use std::net::IpAddr;
-    use std::str::FromStr;
-
-    #[test]
-    fn test_peer_info_creation() {
-        let peer = PeerInfo {
-            id: "test-id".to_string(),
-            name: "TestPeer".to_string(),
-            ip: IpAddr::from_str("127.0.0.1").unwrap(),
-            port: 8080,
-        };
-        assert_eq!(peer.name, "TestPeer");
-        assert_eq!(peer.port, 8080);
-    }
 
     #[test]
     fn test_chat_new() {

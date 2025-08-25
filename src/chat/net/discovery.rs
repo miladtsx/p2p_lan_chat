@@ -17,6 +17,8 @@ const SERVICE_NAME: &str = "_chat._udp.local";
 
 pub async fn start_mdns(peer: Arc<Peer>) -> Result<(), ChatError> {
     // Spawn advertisement in a blocking thread
+    println!("Starting mDNS advertisement for {}:{}", peer.peer_id, peer.port);
+
     let peer_ad = peer.clone();
     tokio::task::spawn_blocking(move || {
         println!("[DEBUG] BROADCASTING {}:{}", peer_ad.peer_id, peer_ad.port);
@@ -27,8 +29,10 @@ pub async fn start_mdns(peer: Arc<Peer>) -> Result<(), ChatError> {
                 return;
             }
         };
+        // Use the same service string as discovery (trim any trailing .local for the responder)
+        let service_type = SERVICE_NAME.trim_end_matches(".local").to_owned();
         let _svc = responder.register(
-            "_chat._udp".to_owned(),
+            service_type,
             format!("{}-{}", peer_ad.name, peer_ad.peer_id),
             peer_ad.port,
             &[&format!("peer_id={}", peer_ad.peer_id), "app=p2pchat"],

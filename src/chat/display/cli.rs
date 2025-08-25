@@ -8,10 +8,50 @@
 use crate::chat::Peer;
 use crate::error::ChatError;
 use crate::peer::NetworkMessage;
+use async_trait::async_trait;
+use hex;
 use serde_json;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::TcpStream;
-use hex;
+
+#[async_trait(?Send)]
+pub trait CliIO {
+    async fn prompt(&mut self, message: &str);
+    async fn read_line(&mut self) -> Result<String, std::io::Error>;
+    fn println(&mut self, message: &str);
+}
+
+pub struct AsyncCliIO<R: tokio::io::AsyncBufRead + Unpin, W: std::io::Write> {
+    reader: R,
+    writer: W,
+}
+
+pub struct StdCliIO;
+
+#[async_trait(?Send)]
+impl<R, W> CliIO for AsyncCliIO<R, W>
+where
+    R: tokio::io::AsyncBufRead + Unpin,
+    W: std::io::Write,
+{
+    async fn prompt(&mut self, message: &str) {
+        write!(self.writer, "{}", message).unwrap();
+        self.writer.flush().unwrap();
+    }
+
+    async fn read_line(&mut self) -> Result<String, std::io::Error> {
+        let mut line = String::new();
+        let bytes = self.reader.read_line(&mut line).await?;
+        if bytes == 0 {
+            return Ok(String::new());
+        }
+        Ok(line)
+    }
+
+    fn println(&mut self, message: &str) {
+        writeln!(self.writer, "{}", message).unwrap();
+    }
+}
 
 pub async fn broadcast_exit(peer: &Peer) -> Result<(), ChatError> {
     let exit_msg = NetworkMessage::Exit(peer.peer_id.clone());
@@ -27,36 +67,36 @@ pub async fn broadcast_exit(peer: &Peer) -> Result<(), ChatError> {
 }
 
 pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
-    println!("\n📋 Commands:");
-    println!("  /list    - List discovered peers");
-    println!("  /msg <message> - Send signed message to all peers");
-    println!("  /unsigned <message> - Send unsigned message to all peers");
-    println!("  /crypto  - Show cryptographic information");
-    println!("  /propose <description> - Propose secure-only messaging upgrade");
-    println!("  /vote <proposal_id> <approve|reject> - Vote on upgrade proposal");
-    println!("  /proposals - List active upgrade proposals");
-    println!("  /status  - Show security status and proposals");
-    println!("  /quit    - Quit the application");
-    println!("  Just type any message to broadcast it (signed by default)!\n");
-
     let stdin = tokio::io::stdin();
-    let mut reader = BufReader::new(stdin);
-    let mut line = String::new();
+    let reader = BufReader::new(stdin);
+    let mut cli_io = AsyncCliIO {
+        reader,
+        writer: std::io::stdout(),
+    };
+
+    cli_io.println("\n📋 Commands:");
+    cli_io.println("  /list    - List discovered peers");
+    cli_io.println("  /msg <message> - Send signed message to all peers");
+    cli_io.println("  /unsigned <message> - Send unsigned message to all peers");
+    cli_io.println("  /crypto  - Show cryptographic information");
+    cli_io.println("  /propose <description> - Propose secure-only messaging upgrade");
+    cli_io.println("  /vote <proposal_id> <approve|reject> - Vote on upgrade proposal");
+    cli_io.println("  /proposals - List active upgrade proposals");
+    cli_io.println("  /status  - Show security status and proposals");
+    cli_io.println("  /quit    - Quit the application");
+    cli_io.println("  Just type any message to broadcast it (signed by default)!\n");
 
     loop {
-        print!("💬 ");
-        std::io::Write::flush(&mut std::io::stdout()).unwrap();
-        line.clear();
-        if reader.read_line(&mut line).await? == 0 {
-            break;
-        }
+        cli_io.prompt("💬 ").await;
+        let line = cli_io.read_line().await.unwrap_or_default();
         let input = line.trim();
         if input.is_empty() {
             continue;
         }
         // Validate input length
         if input.len() > 512 {
-            println!("Input too long. Please keep messages under 512 characters.");
+            cli_io
+                .println("Input too long. Please keep messages under 512 characters.");
             continue;
         }
 
@@ -96,7 +136,10 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
                 println!("  Peer ID: {}", identity.peer_id);
                 println!("  Name: {}", identity.name);
                 println!("  Public Key: {public_key_hex}");
-                println!("  Known Peer Keys: {}", peer.crypto_manager.known_peers_count().await);
+                println!(
+                    "  Known Peer Keys: {}",
+                    peer.crypto_manager.known_peers_count().await
+                );
             }
             "/propose" => {
                 let description = if args.is_empty() {
@@ -104,7 +147,7 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
                 } else {
                     args
                 };
-                
+
                 match peer.propose_secure_upgrade(description).await {
                     Ok(proposal_id) => {
                         println!("✅ Upgrade proposal created successfully!");
@@ -119,10 +162,10 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
                     println!("❌ Usage: /vote <proposal_id> <approve|reject>");
                     continue;
                 }
-                
+
                 let proposal_id = parts[0];
                 let vote_str = parts[1].to_lowercase();
-                
+
                 let the_vote = match vote_str.as_str() {
                     "approve" | "yes" | "true" | "1" => true,
                     "reject" | "no" | "false" | "0" => false,
@@ -131,7 +174,7 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
                         continue;
                     }
                 };
-                
+
                 match peer.vote_on_proposal(proposal_id, the_vote).await {
                     Ok(()) => {
                         let vote_text = if the_vote { "approved" } else { "rejected" };
@@ -148,9 +191,15 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
                     println!("🔐 Active Upgrade Proposals:");
                     for proposal in proposals {
                         println!("  📋 ID: {}", proposal.proposal_id);
-                        println!("    Proposed by: {} ({})", proposal.proposer_name, proposal.proposer_id);
+                        println!(
+                            "    Proposed by: {} ({})",
+                            proposal.proposer_name, proposal.proposer_id
+                        );
                         println!("    Description: {}", proposal.description);
-                        println!("    Required: {}/{} approvals", proposal.required_approvals, proposal.total_peers);
+                        println!(
+                            "    Required: {}/{} approvals",
+                            proposal.required_approvals, proposal.total_peers
+                        );
                         println!("    Created: {}", proposal.timestamp);
                         println!();
                     }
@@ -159,20 +208,32 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
             "/status" => {
                 let secure_enabled = peer.is_secure_only_enabled().await;
                 let proposals = peer.get_active_proposals().await;
-                
+
                 println!("🔐 Security Status:");
-                println!("  Secure-only messaging: {}", if secure_enabled { "✅ ENABLED" } else { "❌ DISABLED" });
+                println!(
+                    "  Secure-only messaging: {}",
+                    if secure_enabled {
+                        "✅ ENABLED"
+                    } else {
+                        "❌ DISABLED"
+                    }
+                );
                 println!("  Active proposals: {}", proposals.len());
-                
+
                 if !proposals.is_empty() {
                     println!("\n📋 Active Proposals:");
                     for proposal in proposals {
                         let votes = peer.get_proposal_votes(&proposal.proposal_id).await;
                         let approval_count = votes.iter().filter(|v| v.approved).count();
                         let rejection_count = votes.iter().filter(|v| !v.approved).count();
-                        
-                        println!("  📋 {}: {}/{} approvals, {} rejections", 
-                            proposal.proposal_id, approval_count, proposal.required_approvals, rejection_count);
+
+                        println!(
+                            "  📋 {}: {}/{} approvals, {} rejections",
+                            proposal.proposal_id,
+                            approval_count,
+                            proposal.required_approvals,
+                            rejection_count
+                        );
                     }
                 }
             }
@@ -194,7 +255,6 @@ pub async fn start_cli_handler(peer: &Peer) -> Result<(), ChatError> {
             }
         }
     }
-    Ok(())
 }
 
 #[cfg(test)]
